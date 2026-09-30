@@ -22,10 +22,9 @@
   --bg:#0a0e14; --bg-2:#11161f; --bg-3:#171d28; --bg-4:#1f2734;
   --border:#242c3a; --border-2:#2e3846;
   --text:#e8eef8; --text-dim:#8b98ab; --text-mut:#5a6472;
-  --accent:#3b9dff; --accent-2:#1e7be0; --accent-3:#1668c4;
+  --accent:#3b9dff; --accent-2:#1e7be0;
   --accent-glow:rgba(59,157,255,.4);
   --accent-soft:rgba(59,157,255,.15);
-  --blue:#3b9dff; --cyan:#22d3ee; --purple:#8b5cf6;
   --danger:#ff4d5e; --warn:#ffb547; --success:#00d26a;
   --bubble-me:linear-gradient(135deg,#1e7be0,#1668c4);
   --bubble-you:linear-gradient(135deg,#1f2734,#171d28);
@@ -36,9 +35,6 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
   --safe-right:env(safe-area-inset-right,0px);
-  --r-lg:18px; --r-md:14px; --r-sm:10px;
-  --shadow-1:0 4px 16px rgba(0,0,0,.4);
-  --shadow-2:0 12px 40px rgba(0,0,0,.55);
 }
 body.light{
   --bg:#eef2f8; --bg-2:#ffffff; --bg-3:#f5f7fb; --bg-4:#e6ecf5;
@@ -70,7 +66,6 @@ input,textarea{font-family:inherit;font-size:15.5px;color:inherit;background:non
   background:
     radial-gradient(ellipse at 20% 10%, rgba(59,157,255,.18), transparent 50%),
     radial-gradient(ellipse at 80% 90%, rgba(34,211,238,.12), transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(139,92,246,.08), transparent 60%),
     linear-gradient(155deg,#0a0e14 0%,#11161f 100%);
   z-index:500;overflow-y:auto;
   padding-top:calc(20px + var(--safe-top));padding-bottom:calc(20px + var(--safe-bottom));
@@ -92,12 +87,6 @@ body.light #loginScreen{
   position:relative;animation:floatY 3s ease-in-out infinite;
 }
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.brand-icon::after{
-  content:'';position:absolute;inset:-8px;border-radius:32px;
-  background:radial-gradient(circle,rgba(59,157,255,.35),transparent 70%);
-  z-index:-1;animation:pulseGlow 2.5s ease-in-out infinite;
-}
-@keyframes pulseGlow{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
 .brand h1{
   font-size:40px;font-weight:900;letter-spacing:-1.5px;
   background:linear-gradient(135deg,#fff,#3b9dff);
@@ -109,7 +98,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .card{
   background:linear-gradient(180deg,var(--bg-2),var(--bg-3));
   border-radius:24px;padding:32px 28px;
-  box-shadow:var(--shadow-2);border:1px solid var(--border);
+  box-shadow:0 12px 40px rgba(0,0,0,.55);border:1px solid var(--border);
   position:relative;overflow:hidden;
 }
 .card::before{
@@ -123,7 +112,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 }
 .field input{
   width:100%;background:var(--bg-3);border:1.5px solid var(--border);
-  border-radius:var(--r-md);padding:16px 18px;transition:.2s;
+  border-radius:14px;padding:16px 18px;transition:.2s;
   font-size:16px;font-weight:600;
 }
 .field input:focus{border-color:var(--accent);background:var(--bg-2);box-shadow:0 0 0 4px var(--accent-soft)}
@@ -147,21 +136,14 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 }
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  padding:15px 22px;border-radius:var(--r-md);font-weight:800;font-size:16px;
+  padding:15px 22px;border-radius:14px;font-weight:800;font-size:16px;
   transition:.2s;white-space:nowrap;
 }
 .btn:active{transform:scale(.97)}
 .btn-primary{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;box-shadow:0 6px 20px rgba(59,157,255,.4);
-  position:relative;overflow:hidden;
 }
-.btn-primary::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent,rgba(255,255,255,.3),transparent);
-  transform:translateX(-100%);transition:transform .5s;
-}
-.btn-primary:hover::before{transform:translateX(100%)}
 .btn-primary:hover{box-shadow:0 8px 28px rgba(59,157,255,.55);transform:translateY(-1px)}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn-ghost{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
@@ -183,13 +165,21 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   font-size:12.5px;font-weight:800;letter-spacing:.3px;
   border:1px solid rgba(59,157,255,.3);margin-top:14px;
 }
+.credit{
+  text-align:center;padding:16px 12px 12px;
+  font-size:12.5px;color:var(--text-mut);font-weight:600;letter-spacing:.3px;
+}
+.credit b{color:var(--accent);font-weight:800}
 
 /* APP */
 #app{display:grid;grid-template-columns:400px 1fr;height:100vh;height:100dvh}
 @media(max-width:860px){
   #app{grid-template-columns:1fr}
-  #app.chatOpen .sidebar{display:none}
-  #app:not(.chatOpen) .chat-area{display:none}
+  #app.chatOpen .sidebar{display:none !important}
+  #app:not(.chatOpen) .chat-area{display:none !important}
+  #app.chatOpen .chat-area{display:flex !important;flex-direction:column}
+  .sidebar{height:100vh;height:100dvh}
+  .chat-area{height:100vh;height:100dvh;min-height:100vh;min-height:100dvh}
 }
 .sidebar{
   background:linear-gradient(180deg,var(--bg-2),var(--bg));
@@ -223,7 +213,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 }
 .icon-btn:hover{background:var(--bg-3);color:var(--text);transform:scale(1.05)}
 .icon-btn:active{transform:scale(.92)}
-.icon-btn.on{background:var(--accent-soft);color:var(--accent)}
 .tabs{display:flex;gap:8px;padding:0 14px 14px;flex-shrink:0;border-bottom:1px solid var(--border)}
 .tab{
   flex:1;padding:11px 12px;border-radius:12px;font-size:14px;font-weight:800;
@@ -231,7 +220,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   display:flex;align-items:center;justify-content:center;gap:7px;
   border:1px solid transparent;
 }
-.tab:hover{background:var(--bg-4);color:var(--text)}
 .tab.on{background:linear-gradient(135deg,var(--accent-soft),rgba(59,157,255,.05));color:var(--accent);border-color:rgba(59,157,255,.35)}
 .tab .badge{background:rgba(0,0,0,.25);padding:2px 8px;border-radius:20px;font-size:11.5px}
 .tab.on .badge{background:var(--accent);color:#fff}
@@ -247,11 +235,9 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .search-inner button{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;padding:11px 18px;border-radius:12px;font-weight:800;font-size:13.5px;
-  flex-shrink:0;transition:.2s;
+  flex-shrink:0;
 }
-.search-inner button:hover{box-shadow:0 4px 14px rgba(59,157,255,.5)}
 .search-inner button:disabled{opacity:.5}
-
 .chat-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
 .chat-item{
   display:flex;gap:13px;padding:13px 16px;cursor:pointer;
@@ -270,15 +256,12 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   font-weight:900;font-size:21px;color:#fff;flex-shrink:0;position:relative;
   overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.25);
 }
-.avatar img{width:100%;height:100%;object-fit:cover}
 .avatar .sdot{
   position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;
   border:3px solid var(--bg-2);background:var(--text-mut);transition:.2s;
 }
 .avatar .sdot.on{background:var(--success);box-shadow:0 0 8px var(--success);animation:pulseS 2s infinite}
 @keyframes pulseS{0%,100%{box-shadow:0 0 8px var(--success)}50%{box-shadow:0 0 16px var(--success)}}
-.avatar.group-av{background:linear-gradient(135deg,#8b5cf6,#22d3ee)!important}
-
 .chat-meta{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
 .chat-r1{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .chat-name{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
@@ -294,31 +277,28 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   background:var(--accent);color:#fff;font-size:11.5px;font-weight:900;
   min-width:22px;height:22px;border-radius:11px;display:grid;place-items:center;
   padding:0 7px;flex-shrink:0;box-shadow:0 0 12px var(--accent-glow);
-  animation:popIn .3s;
 }
-@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
-
 .empty-state{text-align:center;padding:80px 24px;color:var(--text-dim)}
 .empty-state .ic{font-size:64px;margin-bottom:18px;opacity:.35}
-.empty-state h3{font-size:19px;color:var(--text);font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+.empty-state h3{font-size:19px;color:var(--text);font-weight:800;margin-bottom:10px}
 .empty-state p{font-size:14.5px;line-height:1.75;font-weight:500}
 
+/* CHAT AREA */
 .chat-area{
   display:flex;flex-direction:column;background:var(--bg);
-  height:100vh;height:100dvh;position:relative;overflow:hidden;
+  height:100vh;height:100dvh;min-height:100vh;min-height:100dvh;
+  position:relative;overflow:hidden;
   padding-top:var(--safe-top);
 }
 .chat-area::before{
   content:'';position:absolute;inset:0;pointer-events:none;
   background-image:
     radial-gradient(circle at 15% 20%, rgba(59,157,255,.06), transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(34,211,238,.05), transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(139,92,246,.04), transparent 50%);
+    radial-gradient(circle at 85% 80%, rgba(34,211,238,.05), transparent 40%);
 }
 .chat-empty{
   flex:1;display:grid;place-items:center;text-align:center;
   padding:30px;color:var(--text-dim);position:relative;z-index:1;
-  animation:fadeUp .5s ease;
 }
 .chat-empty .ic{font-size:96px;margin-bottom:22px;opacity:.35;animation:floatY 3s ease-in-out infinite}
 .chat-empty h2{font-size:25px;color:var(--text);margin-bottom:12px;font-weight:900;letter-spacing:-.6px}
@@ -337,7 +317,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .chat-header .name{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
 .chat-header .status{font-size:13px;color:var(--text-dim);margin-top:2px;font-weight:600}
 .chat-header .status.on{color:var(--accent)}
-.chat-header .status.typing{color:var(--accent);font-style:italic}
 
 .messages{
   flex:1;overflow-y:auto;padding:22px 44px 14px;position:relative;z-index:1;
@@ -367,26 +346,17 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   align-self:flex-start;background:var(--bubble-you);color:var(--bubble-you-t);
   border-bottom-left-radius:5px;border:1px solid var(--border);
 }
-.msg .sender{font-size:13px;font-weight:900;color:var(--accent);margin-bottom:4px;display:block;letter-spacing:-.2px}
 .msg .txt{white-space:pre-wrap;word-break:break-word}
 .msg .meta{
   display:flex;align-items:center;gap:5px;justify-content:flex-end;
   font-size:11.5px;margin-top:4px;opacity:.9;line-height:1;font-weight:700;
 }
 .msg .meta .time{opacity:.85}
-
-/* ✅ WHATSAPP JAISE TICKS */
-.tick{
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:14px;line-height:1;transition:.2s;
-  font-family:inherit;
-}
+.tick{display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;transition:.2s}
 .tick.pending{color:var(--warn);animation:pulseD 1.5s infinite;font-size:13px}
 .tick.sent{color:var(--tick-grey);font-size:13px;letter-spacing:-2px}
 .tick.delivered{color:var(--tick-grey);font-size:13px;letter-spacing:-2px}
 .tick.read{color:var(--tick-blue);font-size:13px;letter-spacing:-2px}
-.tick.read::after,.tick.delivered::after,.tick.sent::after{content:''}
-
 .msg.system{
   align-self:center;background:var(--bg-3);color:var(--text-dim);
   font-size:13px;padding:7px 16px;border-radius:20px;border:1px solid var(--border);
@@ -413,7 +383,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .voice-msg .wave i:nth-child(3n){animation-delay:.3s}
 @keyframes waveA{0%,100%{height:6px}50%{height:20px}}
 .voice-msg .dur{font-size:12.5px;font-weight:800;opacity:.85}
-
 .typing-ind{
   align-self:flex-start;background:var(--bubble-you);
   border:1px solid var(--border);padding:12px 18px;border-radius:16px;
@@ -447,17 +416,14 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   width:48px;height:48px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;display:grid;place-items:center;font-size:19px;flex-shrink:0;
-  box-shadow:0 6px 20px rgba(59,157,255,.45);transition:.15s;
+  box-shadow:0 6px 20px rgba(59,157,255,.45);
 }
-.send-btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(59,157,255,.6)}
 .send-btn:active{transform:scale(.9)}
-.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
 .attach-menu{
   display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
   padding:16px;background:var(--bg-3);border-radius:16px;
-  margin-bottom:10px;animation:slideDown .25s cubic-bezier(.2,.9,.3,1);
-  border:1px solid var(--border);
+  margin-bottom:10px;animation:slideDown .25s;border:1px solid var(--border);
 }
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 .attach-btn{
@@ -466,16 +432,15 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   font-size:12.5px;font-weight:800;color:var(--text-dim);transition:.2s;
   border:1px solid var(--border);
 }
-.attach-btn:hover{background:var(--bg-4);color:var(--text);transform:translateY(-2px);border-color:var(--accent)}
+.attach-btn:hover{background:var(--bg-4);color:var(--text);border-color:var(--accent)}
 .attach-btn .ic{font-size:24px}
-
 .recording-bar{
   display:flex;align-items:center;gap:14px;padding:12px 18px;
   background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,77,94,.05));
   border:1.5px solid rgba(255,77,94,.4);border-radius:14px;margin-bottom:10px;
 }
 .recording-bar .dot-rec{width:12px;height:12px;border-radius:50%;background:var(--danger);animation:pulseD 1s infinite}
-.recording-bar .rec-time{font-weight:900;font-size:17px;color:var(--danger);font-variant-numeric:tabular-nums}
+.recording-bar .rec-time{font-weight:900;font-size:17px;color:var(--danger)}
 .recording-bar .rec-info{flex:1;font-size:13.5px;color:var(--text-dim);font-weight:600}
 .recording-bar .rec-btn{padding:9px 16px;border-radius:20px;font-weight:800;font-size:13.5px}
 .recording-bar .rec-btn.cancel{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
@@ -488,55 +453,40 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .modal{
   background:linear-gradient(180deg,var(--bg-2),var(--bg-3));
   border:1px solid var(--border);border-radius:22px;padding:28px;
-  width:100%;max-width:440px;box-shadow:var(--shadow-2);
-  animation:pop .25s cubic-bezier(.2,.9,.3,1);
-  max-height:calc(100vh - 40px);overflow-y:auto;position:relative;
+  width:100%;max-width:440px;box-shadow:0 12px 40px rgba(0,0,0,.55);
+  animation:pop .25s;max-height:calc(100vh - 40px);overflow-y:auto;position:relative;
 }
 @keyframes pop{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:none;opacity:1}}
-.modal::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(59,157,255,.6),transparent);
-}
 .modal h2{font-size:22px;font-weight:900;margin-bottom:8px;letter-spacing:-.5px}
 .modal .msub{color:var(--text-dim);font-size:14px;margin-bottom:22px;line-height:1.6;font-weight:500}
 .modal .actions{display:flex;gap:10px;margin-top:10px}
 .modal .actions .btn{flex:1}
-
 .id-display{
   background:linear-gradient(135deg,var(--bg-3),var(--bg-4));
   border:2px dashed var(--accent);border-radius:16px;padding:20px;
   text-align:center;margin-bottom:16px;position:relative;overflow:hidden;
 }
-.id-display::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at 30% 30%,rgba(59,157,255,.15),transparent 60%);
-}
-.id-display .id-label{font-size:12px;color:var(--text-dim);font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;position:relative}
+.id-display .id-label{font-size:12px;color:var(--text-dim);font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
 .id-display .id-value{
   font-size:28px;font-weight:900;color:var(--accent);
-  font-family:ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.5px;position:relative;
+  font-family:ui-monospace,SFMono-Regular,monospace;letter-spacing:.5px;
   text-shadow:0 0 20px rgba(59,157,255,.5);
 }
-.id-display .id-actions{display:flex;gap:10px;margin-top:14px;position:relative}
+.id-display .id-actions{display:flex;gap:10px;margin-top:14px}
 .id-display .id-actions button{
   flex:1;padding:11px;border-radius:10px;font-weight:800;font-size:13.5px;
-  background:var(--bg-2);border:1px solid var(--border);transition:.2s;
+  background:var(--bg-2);border:1px solid var(--border);
 }
 .id-display .id-actions button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.credit{
-  text-align:center;padding:16px 12px 12px;
-  font-size:12.5px;color:var(--text-mut);font-weight:600;letter-spacing:.3px;
-}
-.credit b{color:var(--accent);font-weight:800}
-
+/* ✅ CLOUD INDICATOR — CENTER */
 .cloud-indicator{
-  position:fixed;top:calc(10px + var(--safe-top));right:calc(12px + var(--safe-right));
+  position:fixed;top:calc(10px + var(--safe-top));left:50%;transform:translateX(-50%);
   z-index:950;background:var(--bg-2);border:1px solid var(--border);
   border-radius:20px;padding:7px 14px;font-size:12px;font-weight:800;
   color:var(--text-dim);display:flex;align-items:center;gap:7px;
-  box-shadow:var(--shadow-1);transition:.2s;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);transition:.2s;
+  pointer-events:none;
 }
 .cloud-indicator.on{color:var(--accent);border-color:rgba(59,157,255,.4);background:rgba(59,157,255,.08)}
 .cloud-indicator .cdot{width:8px;height:8px;border-radius:50%;background:var(--text-mut)}
@@ -552,18 +502,26 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   background:var(--bg-2);border:1px solid var(--border);
   border-left:4px solid var(--accent);
   padding:14px 22px;border-radius:14px;font-size:14px;font-weight:700;
-  box-shadow:var(--shadow-2);animation:toastIn .3s cubic-bezier(.2,.9,.3,1);
+  box-shadow:0 12px 40px rgba(0,0,0,.55);animation:toastIn .3s;
   max-width:92vw;word-break:break-word;
 }
 .toast.err{border-left-color:var(--danger)}
-.toast.info{border-left-color:var(--cyan)}
+.toast.info{border-left-color:#22d3ee}
 @keyframes toastIn{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 
 @media(max-width:400px){
   .brand h1{font-size:32px}
   .brand-icon{width:72px;height:72px;font-size:38px}
   .card{padding:24px 20px}
+  .chat-header{padding:10px 12px}
+  .chat-header .avatar{width:40px;height:40px;font-size:16px}
+  .chat-header .name{font-size:15px}
+  .chat-header .status{font-size:11.5px}
+  .icon-btn{width:40px;height:40px;font-size:17px}
+  .msg{max-width:88%}
+  .messages{padding:14px 10px 8px}
   .id-display .id-value{font-size:24px}
+  .cloud-indicator{font-size:11px;padding:5px 11px}
 }
 </style>
 </head>
@@ -585,7 +543,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
     <div class="card">
       <div class="field">
         <label>Your Name</label>
-        <input id="inpName" type="text" placeholder="Ali Khan" maxlength="24" autocomplete="off">
+        <input id="inpName" type="text" placeholder="Apna naam likhein" maxlength="24" autocomplete="off">
       </div>
       <div class="field">
         <label>Your Unique ID</label>
@@ -651,9 +609,9 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 
     <div class="chat-header hide" id="chatHeader">
       <button class="icon-btn back" onclick="closeChatMobile()">←</button>
-      <div class="avatar" id="chatAv" onclick="openChatInfo()">A<span class="sdot" id="chatSdot"></span></div>
+      <div class="avatar" id="chatAv" onclick="openChatInfo()">?<span class="sdot" id="chatSdot"></span></div>
       <div class="info" onclick="openChatInfo()">
-        <div class="name" id="chatName"></div>
+        <div class="name" id="chatName">---</div>
         <div class="status" id="chatStatus">Offline</div>
       </div>
       <button class="icon-btn" onclick="openChatMenu()" title="Menu">⋮</button>
@@ -693,7 +651,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 <script>
 /* =====================================================================
    WaqarChat — Created by Waqar Ahmed
-   Firebase Config
    ===================================================================== */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyAZtS_Cej59NEDhWo6WV2MsvTj2hZERbe8",
@@ -715,10 +672,7 @@ function initFirebase(){
     cloudReady = true;
     updateCloud('on','Ready');
     return true;
-  }catch(e){
-    console.error('Firebase init error:', e);
-    return false;
-  }
+  }catch(e){ console.error('Firebase init:', e); return false; }
 }
 function updateCloud(state, text){
   const el = $('#cloudIndicator');
@@ -799,7 +753,10 @@ function startCloudListener(){
           if(currentChat !== chatId){
             chats[chatId].unread = (chats[chatId].unread || 0) + 1;
             showNotification(d.fromName || chatId, d.text || `[${d.kind}]`, ()=>{ window.focus(); openChat(chatId); });
-          } else renderMessages();
+          } else {
+            msg.read = true;
+            renderMessages();
+          }
           newCount++;
         }
         batch.delete(doc.ref);
@@ -818,7 +775,7 @@ function startCloudListener(){
 /* =====================================================================
    MAIN LOGIC
    ===================================================================== */
-const PREFIX = 'waqarchat-v1-';
+const PREFIX = 'waqarchat-v3-';
 const LS = {
   get(k,d){ try{ const v=localStorage.getItem('wc_'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
   set(k,v){ try{ localStorage.setItem('wc_'+k, JSON.stringify(v)); }catch(e){} }
@@ -866,10 +823,8 @@ function toast(msg, type='ok'){
 function avatarHTML(id, name, opts={}){
   const color = opts.color || pickColor(id);
   const initial = (name||id||'?')[0].toUpperCase();
-  return `<div class="avatar${opts.group?' group-av':''}" style="background:${color};${opts.size?`width:${opts.size}px;height:${opts.size}px;font-size:${opts.size*0.4}px`:''}">${initial}${opts.extra||''}</div>`;
+  return `<div class="avatar" style="background:${color};${opts.size?`width:${opts.size}px;height:${opts.size}px;font-size:${opts.size*0.4}px`:''}">${initial}${opts.extra||''}</div>`;
 }
-
-/* TICKS — WhatsApp jaise */
 function tickHTML(status){
   if(status === 'pending') return `<span class="tick pending" title="Pending">⏳</span>`;
   if(status === 'read') return `<span class="tick read" title="Read">✓✓</span>`;
@@ -883,19 +838,26 @@ function tickMiniHTML(status){
   return `<span class="tick-mini">✓</span>`;
 }
 
-/* LOGIN */
+/* ============ LOGIN ============ */
 let selectedAvColor = AV_COLORS[0];
 document.addEventListener('DOMContentLoaded', ()=>{
   $('#avPicker').innerHTML = AV_COLORS.map((c,i)=>
     `<div class="avatar-opt ${i===0?'on':''}" style="background:${c}" data-c="${c}" onclick="pickAvColor('${c}',this)"></div>`
   ).join('');
-  if(me){
+  
+  // ✅ IMPORTANT: Purani ID yaad rakho — nayi NAHI banao
+  if(me && me.id){
     $('#inpName').value = me.name || '';
     $('#inpId').value = me.id || '';
-    if(me.color){ selectedAvColor = me.color; $$('.avatar-opt').forEach(el=>el.classList.toggle('on', el.dataset.c===me.color)); }
+    if(me.color){
+      selectedAvColor = me.color;
+      $$('.avatar-opt').forEach(el=>el.classList.toggle('on', el.dataset.c === me.color));
+    }
   } else {
-    $('#inpId').value = 'user-' + Math.floor(1000+Math.random()*9000);
+    // Pehli dafa — nayi ID suggest karo
+    $('#inpId').value = 'user-' + Math.floor(1000 + Math.random()*9000);
   }
+  
   $('#inpId').addEventListener('input', e=>{ e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9\-]/g,''); });
   ['inpName','inpId'].forEach(id=>{ $('#'+id).addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); }); });
   $('#filePick').addEventListener('change', handleFilePick);
@@ -945,10 +907,10 @@ function startPeer(){
       const newId = 'user-' + Math.floor(1000+Math.random()*9000);
       $('#inpId').value = newId;
       $('#statusDot').className = 'dot off';
-      $('#statusText').textContent = 'ID taken. Nayi try karein.';
+      $('#statusText').textContent = 'Yeh ID already use mein hai. Doosri try karein.';
       $('#loginBtn').disabled = false;
       $('#loginBtn').textContent = '🚀 Start Chatting';
-      toast('Yeh ID use mein hai','err');
+      toast('Yeh ID use mein hai — koi aur ID likhein','err');
     } else if(t === 'network'){
       $('#statusDot').className = 'dot off';
       $('#statusText').textContent = 'Peer server issue';
@@ -1003,7 +965,6 @@ function setupDataConnection(conn, outgoing, forcedId){
     online.add(userId);
     if(!chats[userId]) chats[userId] = { type:'dm', name: userId, messages: [], unread:0, lastSeen: now() };
     conn.send({ type:'hello', from:me.id, name:me.name, color:me.color });
-    // ✅ Mark all pending messages as delivered
     if(chats[userId]){
       chats[userId].messages.forEach(m=>{
         if(m.from === 'me' && m.status === 'sent') m.status = 'delivered';
@@ -1074,17 +1035,13 @@ function handleIncoming(data, fromId, conn){
       break;
     case 'msg': case 'image': case 'file': case 'voice':
       addMessage(fromId, { from:'them', ts: data.ts || now(), read:false, ...data }, true);
-      // ✅ Send delivered receipt
       if(conn && conn.open) try{ conn.send({ type:'delivered', ts: data.ts }); }catch(e){}
       break;
     case 'delivered':
-      // ✅ Mark MY messages as delivered
       const c = chats[fromId];
       if(c){
         c.messages.forEach(m=>{
-          if(m.from==='me' && m.ts <= data.ts && m.status !== 'read'){
-            m.status = 'delivered';
-          }
+          if(m.from==='me' && m.ts <= data.ts && m.status !== 'read') m.status = 'delivered';
         });
         LS.set('chats', chats);
         if(currentChat===fromId) renderMessages();
@@ -1093,12 +1050,9 @@ function handleIncoming(data, fromId, conn){
       break;
     case 'typing': if(currentChat === fromId) showTyping(data.on); break;
     case 'read':
-      // ✅ Mark MY messages as read (blue ticks)
       const cc = chats[fromId];
       if(cc){
-        cc.messages.forEach(m=>{
-          if(m.from==='me'){ m.read=true; m.status='read'; }
-        });
+        cc.messages.forEach(m=>{ if(m.from==='me'){ m.read=true; m.status='read'; } });
         LS.set('chats', chats);
         if(currentChat===fromId) renderMessages();
         renderChatList();
@@ -1181,30 +1135,43 @@ function renderChatList(){
   }).join('');
 }
 
+/* ✅ OPEN CHAT — FIXED FOR MOBILE + LOAD MESSAGES */
 function openChat(id){
+  if(!id){ toast('Chat ID missing','err'); return; }
   currentChat = id;
   if(!chats[id]) chats[id] = { type:'dm', name:id, messages:[], unread:0, lastSeen:now() };
   chats[id].unread = 0;
   LS.set('chats', chats);
+
+  // Show chat UI
   $('#chatEmpty').classList.add('hide');
   $('#chatHeader').classList.remove('hide');
   $('#messages').classList.remove('hide');
   $('#inputBar').classList.remove('hide');
+
+  // Mobile layout
+  $('#app').classList.add('chatOpen');
+
+  // ✅ Load messages FIRST
   updateChatHeader();
   renderMessages();
   renderChatList();
-  $('#app').classList.add('chatOpen');
-  setTimeout(()=>$('#msgInput').focus(), 200);
+
+  // Focus input after
+  setTimeout(()=>{ try{ $('#msgInput').focus(); }catch(e){} }, 300);
+
+  // Read receipts
   const c = connections[id];
   if(c && c.open){
     chats[id].messages.forEach(m=>{ if(m.from==='them') m.read=true; });
     LS.set('chats', chats);
     try{ c.send({ type:'read' }); }catch(e){}
-    // Mark own messages as read when peer sees them (already sent)
-    renderMessages();
   }
 }
-function closeChatMobile(){ $('#app').classList.remove('chatOpen'); }
+function closeChatMobile(){
+  $('#app').classList.remove('chatOpen');
+  currentChat = null;
+}
 function updateChatHeader(){
   if(!currentChat) return;
   const c = chats[currentChat];
@@ -1223,7 +1190,7 @@ function renderMessages(){
   if(!currentChat) return;
   const c = chats[currentChat];
   const box = $('#messages');
-  if(!c.messages.length){
+  if(!c || !c.messages || !c.messages.length){
     box.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein aur Enter dabayein</span></div>`;
     return;
   }
@@ -1234,8 +1201,6 @@ function renderMessages(){
     if(m.from === 'system'){ html += `<div class="msg system">${esc(m.text)}</div>`; return; }
     const isMe = m.from === 'me';
     const cls = isMe ? 'me' : 'you';
-    const senderLabel = !isMe && c.type==='group' ? `<span class="sender">${esc(m.senderName||'User')}</span>` : '';
-    // ✅ WhatsApp style ticks
     const tick = isMe ? tickHTML(m.status || 'sent') : '';
     let contentHTML = '';
     if(m.kind === 'image') contentHTML = `<img src="${esc(m.data)}" class="msg-img" onclick="viewImage('${esc(m.data)}')">`;
@@ -1245,7 +1210,7 @@ function renderMessages(){
       contentHTML = `<div class="voice-msg" data-src="${esc(m.data)}" id="${id}"><button class="vbtn" onclick="playVoice('${id}',this)">▶</button><div class="wave">${Array.from({length:12}).map(()=>`<i style="height:${6+Math.random()*14}px"></i>`).join('')}</div><span class="dur">${fmtSec(m.duration||0)}</span></div>`;
     }
     else contentHTML = `<div class="txt">${esc(m.text||'')}</div>`;
-    html += `<div class="msg ${cls}">${senderLabel}${contentHTML}<div class="meta"><span class="time">${timeStr(m.ts)}</span>${tick}</div></div>`;
+    html += `<div class="msg ${cls}">${contentHTML}<div class="meta"><span class="time">${timeStr(m.ts)}</span>${tick}</div></div>`;
   });
   box.innerHTML = html;
   box.scrollTop = box.scrollHeight;
@@ -1258,7 +1223,6 @@ async function sendMessage(){
   if(!text) return;
   const c = chats[currentChat];
   const msg = { from:'me', kind:'text', text, ts: now(), read:false };
-
   const conn = connections[currentChat];
   if(conn && conn.open){
     try{ conn.send({ type:'msg', text, ts: msg.ts }); msg.status = 'sent'; }
@@ -1267,8 +1231,7 @@ async function sendMessage(){
     msg.status = 'sent';
   }
   const cloudOk = await cloudSendMessage(msg, currentChat);
-  if(cloudOk && !(conn && conn.open)) toast('☁️ Cloud pe saved — dost ko milega', 'info');
-
+  if(cloudOk && !(conn && conn.open)) toast('☁️ Cloud pe saved', 'info');
   c.messages.push(msg);
   c.lastSeen = now();
   LS.set('chats', chats);
@@ -1469,7 +1432,7 @@ function saveProfile(){
   $('#myAv').textContent = me.name[0].toUpperCase();
   closeModal(); toast('✅ Save');
 }
-function logout(){ if(!confirm('Logout?')) return; try{ peer.destroy(); }catch(e){} if(cloudUnsubscribe){ try{cloudUnsubscribe();}catch(e){} } location.reload(); }
+function logout(){ if(!confirm('Logout? Aap ki ID aur chats safe rahengi.')) return; try{ peer.destroy(); }catch(e){} if(cloudUnsubscribe){ try{cloudUnsubscribe();}catch(e){} } location.reload(); }
 
 function openSettings(){
   openModal(`
@@ -1494,7 +1457,7 @@ function openSettings(){
 function setTheme(t){ document.body.classList.toggle('light', t==='light'); LS.set('theme', t); updateThemeBtn(); closeModal(); }
 function updateThemeBtn(){ $('#themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; }
 $('#themeBtn').addEventListener('click', ()=>{ setTheme(document.body.classList.contains('light')?'dark':'light'); });
-function clearAll(){ if(!confirm('Sab delete?')) return; localStorage.clear(); location.reload(); }
+function clearAll(){ if(!confirm('Sab delete? Aap ki ID bhi gayab ho jayegi.')) return; localStorage.clear(); location.reload(); }
 
 function openFindPeople(){
   openModal(`
@@ -1524,7 +1487,7 @@ function openChatMenu(){
   `);
 }
 function clearChat(){ if(!currentChat) return; if(!confirm('Local messages delete?')) return; chats[currentChat].messages=[]; LS.set('chats',chats); renderMessages(); renderChatList(); }
-function deleteChat(){ if(!currentChat) return; if(!confirm('Poori chat delete?')) return; delete chats[currentChat]; LS.set('chats',chats); currentChat=null; $('#chatEmpty').classList.remove('hide'); $('#chatHeader').classList.add('hide'); $('#messages').classList.add('hide'); $('#inputBar').classList.add('hide'); $('#app').classList.remove('chatOpen'); renderChatList(); }
+function deleteChat(){ if(!currentChat) return; if(!confirm('Poori chat delete?')) return; delete chats[currentChat]; LS.set('chats',chats); closeChatMobile(); $('#chatEmpty').classList.remove('hide'); $('#chatHeader').classList.add('hide'); $('#messages').classList.add('hide'); $('#inputBar').classList.add('hide'); renderChatList(); }
 function openChatInfo(){
   if(!currentChat) return;
   const c = chats[currentChat];
@@ -1561,7 +1524,6 @@ function showNotification(title, body, onclick){
   }catch(e){}
 }
 
-/* PWA */
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
@@ -1580,9 +1542,7 @@ function installPWA(){
 }
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('✅ SW:', reg.scope))
-      .catch(err => console.log('SW fail:', err));
+    navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW:', err));
   });
 }
 
