@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="robots" content="noindex, nofollow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0a0e14">
@@ -1058,14 +1057,12 @@ function renderChatList(){
 function openChat(id){
   if(!id){ toast('Chat ID missing','err'); return; }
   
-  // ✅ STEP 1: localStorage se chats DOBARA load karo (yahi asal fix hai)
+  // ✅ localStorage se chats load
   try {
     const stored = localStorage.getItem('wc_chats');
     if(stored){
       const parsed = JSON.parse(stored);
-      if(parsed && typeof parsed === 'object'){
-        chats = parsed;
-      }
+      if(parsed && typeof parsed === 'object') chats = parsed;
     }
   } catch(e) { console.error('Reload err:', e); }
   
@@ -1086,50 +1083,14 @@ function openChat(id){
 
   updateChatHeader();
   
-  // ✅ STEP 2: FORCE RENDER — bar bar try karo
-  const forceRender = () => {
-    const box = document.getElementById('messages');
-    if(!box) return;
-    const c = chats[currentChat];
-    if(!c) return;
-    
-    if(!c.messages || c.messages.length === 0){
-      box.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein</span></div>';
-      return;
-    }
-    
-    let html = '', lastDay = '';
-    c.messages.forEach(m => {
-      const day = dayLabel(m.ts);
-      if(day !== lastDay){ html += '<div class="day-div">' + esc(day) + '</div>'; lastDay = day; }
-      if(m.from === 'system'){ html += '<div class="msg system">' + esc(m.text) + '</div>'; return; }
-      const isMe = m.from === 'me';
-      const cls = isMe ? 'me' : 'you';
-      const tick = isMe ? tickHTML(m.status || 'sent') : '';
-      let content = '';
-      if(m.kind === 'image') content = '<img src="' + esc(m.data) + '" class="msg-img" onclick="viewImage(\'' + esc(m.data) + '\')">';
-      else if(m.kind === 'file') content = '<div class="file-msg"><div class="ficon">📎</div><div><div class="fname">' + esc(m.name) + '</div><div class="fsize">' + fmtSize(m.size||0) + '</div></div></div>';
-      else if(m.kind === 'voice'){
-        const vid = 'v-' + m.ts;
-        content = '<div class="voice-msg" data-src="' + esc(m.data) + '" id="' + vid + '"><button class="vbtn" onclick="playVoice(\'' + vid + '\',this)">▶</button><div class="wave">' + Array.from({length:12}).map(()=>'<i style="height:' + (6+Math.random()*14) + 'px"></i>').join('') + '</div><span class="dur">' + fmtSec(m.duration||0) + '</span></div>';
-      }
-      else content = '<div class="txt">' + esc(m.text||'') + '</div>';
-      html += '<div class="msg ' + cls + '">' + content + '<div class="meta"><span>' + timeStr(m.ts) + '</span>' + tick + '</div></div>';
-    });
-    box.innerHTML = html;
-    box.scrollTop = box.scrollHeight;
-  };
+  // ✅ EK DAFA render — smooth
+  renderMessages();
   
-  // 5 baar force render — timing issue khatam
-  forceRender();
-  requestAnimationFrame(forceRender);
-  setTimeout(forceRender, 30);
-  setTimeout(forceRender, 100);
-  setTimeout(forceRender, 300);
-  setTimeout(forceRender, 600);
+  // ✅ Sirf 1 aur baar — agar layout ab tak ready nahi hua
+  requestAnimationFrame(() => renderMessages());
   
   renderChatList();
-  setTimeout(() => { try { document.getElementById('msgInput').focus(); } catch(e){} }, 400);
+  setTimeout(() => { try { document.getElementById('msgInput').focus(); } catch(e){} }, 300);
 
   const c = connections[id];
   if(c && c.open){
@@ -1138,7 +1099,7 @@ function openChat(id){
     try { c.send({ type:'read' }); } catch(e){}
   }
   
-  // Cloud fetch (jo undelivered hain)
+  // ✅ Cloud fetch — sirf NAYE messages add karo, phir smooth render
   if(cloudReady && db){
     setTimeout(async () => {
       try {
@@ -1166,12 +1127,14 @@ function openChat(id){
           if(added > 0){
             chats[id].messages.sort((a,b)=>a.ts - b.ts);
             LS.set('chats', chats);
-            forceRender();
+            // ✅ Sirf tab render jab naya message aaya
+            renderMessages();
+            renderChatList();
           }
           await batch.commit();
         }
       } catch(e){ console.log('Cloud fetch:', e); }
-    }, 300);
+    }, 500);
   }
 }
 function closeChatMobile(){
@@ -1208,32 +1171,40 @@ function updateChatHeader(){
 function renderMessages(){
   if(!currentChat) return;
   const c = chats[currentChat];
-  const box = $('#messages');
+  const box = document.getElementById('messages');
   if(!box) return;
   
   if(!c || !c.messages || !c.messages.length){
-    box.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein</span></div>`;
+    box.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein</span></div>';
     return;
   }
+  
   let html = '', lastDay = '';
-  c.messages.forEach(m=>{
+  c.messages.forEach(m => {
     const day = dayLabel(m.ts);
-    if(day !== lastDay){ html += `<div class="day-div">${esc(day)}</div>`; lastDay = day; }
-    if(m.from === 'system'){ html += `<div class="msg system">${esc(m.text)}</div>`; return; }
+    if(day !== lastDay){ html += '<div class="day-div">' + esc(day) + '</div>'; lastDay = day; }
+    if(m.from === 'system'){ html += '<div class="msg system">' + esc(m.text) + '</div>'; return; }
     const isMe = m.from === 'me';
     const cls = isMe ? 'me' : 'you';
     const tick = isMe ? tickHTML(m.status || 'sent') : '';
-    let contentHTML = '';
-    if(m.kind === 'image') contentHTML = `<img src="${esc(m.data)}" class="msg-img" onclick="viewImage('${esc(m.data)}')">`;
-    else if(m.kind === 'file') contentHTML = `<div class="file-msg"><div class="ficon">📎</div><div><div class="fname">${esc(m.name)}</div><div class="fsize">${fmtSize(m.size||0)}</div></div></div>`;
+    let content = '';
+    if(m.kind === 'image') content = '<img src="' + esc(m.data) + '" class="msg-img" onclick="viewImage(\'' + esc(m.data) + '\')">';
+    else if(m.kind === 'file') content = '<div class="file-msg"><div class="ficon">📎</div><div><div class="fname">' + esc(m.name) + '</div><div class="fsize">' + fmtSize(m.size||0) + '</div></div></div>';
     else if(m.kind === 'voice'){
-      const id = 'v-'+m.ts;
-      contentHTML = `<div class="voice-msg" data-src="${esc(m.data)}" id="${id}"><button class="vbtn" onclick="playVoice('${id}',this)">▶</button><div class="wave">${Array.from({length:12}).map(()=>`<i style="height:${6+Math.random()*14}px"></i>`).join('')}</div><span class="dur">${fmtSec(m.duration||0)}</span></div>`;
+      const vid = 'v-' + m.ts;
+      content = '<div class="voice-msg" data-src="' + esc(m.data) + '" id="' + vid + '"><button class="vbtn" onclick="playVoice(\'' + vid + '\',this)">▶</button><div class="wave">' + Array.from({length:12}).map(()=>'<i style="height:' + (6+Math.random()*14) + 'px"></i>').join('') + '</div><span class="dur">' + fmtSec(m.duration||0) + '</span></div>';
     }
-    else contentHTML = `<div class="txt">${esc(m.text||'')}</div>`;
-    html += `<div class="msg ${cls}">${contentHTML}<div class="meta"><span>${timeStr(m.ts)}</span>${tick}</div></div>`;
+    else content = '<div class="txt">' + esc(m.text||'') + '</div>';
+    html += '<div class="msg ' + cls + '">' + content + '<div class="meta"><span>' + timeStr(m.ts) + '</span>' + tick + '</div></div>';
   });
-  box.innerHTML = html;
+  
+  // ✅ Sirf tab update karo agar HTML change hua ho
+  const newHTML = html;
+  if(box.dataset.lastHTML === newHTML){
+    return;  // ← Same hai, kuch nahi karo (no flicker)
+  }
+  box.dataset.lastHTML = newHTML;
+  box.innerHTML = newHTML;
   box.scrollTop = box.scrollHeight;
 }
 
@@ -1543,3 +1514,4 @@ window.addEventListener('focus', async ()=>{
 </script>
 </body>
 </html>
+ 
