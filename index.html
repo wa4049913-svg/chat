@@ -6,17 +6,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0a0e14">
 <title>WaqarChat — Pakistan Ka Chat App</title>
-
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WaqarChat">
 <link rel="apple-touch-icon" href="icon-192.png">
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -145,10 +142,8 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;box-shadow:0 6px 20px rgba(59,157,255,.4);
 }
-.btn-primary:hover{box-shadow:0 8px 28px rgba(59,157,255,.55);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .btn-ghost{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--bg-4);border-color:var(--border-2)}
 .btn-danger{background:linear-gradient(135deg,var(--danger),#e0333f);color:#fff}
 .btn-block{width:100%}
 .status-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;font-size:14px;color:var(--text-dim);font-weight:600}
@@ -166,10 +161,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   font-size:12.5px;font-weight:800;letter-spacing:.3px;
   border:1px solid rgba(59,157,255,.3);margin-top:14px;
 }
-.credit{
-  text-align:center;padding:16px 12px 12px;
-  font-size:12.5px;color:var(--text-mut);font-weight:600;letter-spacing:.3px;
-}
+.credit{text-align:center;padding:16px 12px 12px;font-size:12.5px;color:var(--text-mut);font-weight:600}
 .credit b{color:var(--accent);font-weight:800}
 
 /* APP */
@@ -194,7 +186,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   font-weight:900;font-size:20px;color:#fff;flex-shrink:0;position:relative;
   cursor:pointer;transition:.2s;box-shadow:0 4px 14px rgba(0,0,0,.3);
 }
-.my-av:hover{transform:scale(1.05) rotate(-3deg)}
 .my-av::after{
   content:'';position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;
   border-radius:50%;background:var(--success);border:3px solid var(--bg-2);
@@ -212,7 +203,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
   font-size:19px;color:var(--text-dim);transition:.2s;flex-shrink:0;
 }
-.icon-btn:hover{background:var(--bg-3);color:var(--text);transform:scale(1.05)}
 .icon-btn:active{transform:scale(.92)}
 .tabs{display:flex;gap:8px;padding:0 14px 14px;flex-shrink:0;border-bottom:1px solid var(--border)}
 .tab{
@@ -248,8 +238,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
   background:var(--accent);opacity:0;transition:.2s;
 }
-.chat-item:hover,.chat-item:active{background:var(--bg-3)}
-.chat-item:hover::before{opacity:.4}
+.chat-item:active{background:var(--bg-3)}
 .chat-item.active{background:var(--bg-3)}
 .chat-item.active::before{opacity:1}
 .avatar{
@@ -261,8 +250,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;
   border:3px solid var(--bg-2);background:var(--text-mut);transition:.2s;
 }
-.avatar .sdot.on{background:var(--success);box-shadow:0 0 8px var(--success);animation:pulseS 2s infinite}
-@keyframes pulseS{0%,100%{box-shadow:0 0 8px var(--success)}50%{box-shadow:0 0 16px var(--success)}}
+.avatar .sdot.on{background:var(--success);box-shadow:0 0 8px var(--success)}
 .chat-meta{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
 .chat-r1{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .chat-name{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
@@ -277,7 +265,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .unread{
   background:var(--accent);color:#fff;font-size:11.5px;font-weight:900;
   min-width:22px;height:22px;border-radius:11px;display:grid;place-items:center;
-  padding:0 7px;flex-shrink:0;box-shadow:0 0 12px var(--accent-glow);
+  padding:0 7px;flex-shrink:0;
 }
 .empty-state{text-align:center;padding:80px 24px;color:var(--text-dim)}
 .empty-state .ic{font-size:64px;margin-bottom:18px;opacity:.35}
@@ -291,20 +279,13 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   position:relative;overflow:hidden;
   padding-top:var(--safe-top);
 }
-.chat-area::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:
-    radial-gradient(circle at 15% 20%, rgba(59,157,255,.06), transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(34,211,238,.05), transparent 40%);
-}
 .chat-empty{
   flex:1;display:grid;place-items:center;text-align:center;
   padding:30px;color:var(--text-dim);position:relative;z-index:1;
 }
-.chat-empty .ic{font-size:96px;margin-bottom:22px;opacity:.35;animation:floatY 3s ease-in-out infinite}
-.chat-empty h2{font-size:25px;color:var(--text);margin-bottom:12px;font-weight:900;letter-spacing:-.6px}
+.chat-empty .ic{font-size:96px;margin-bottom:22px;opacity:.35}
+.chat-empty h2{font-size:25px;color:var(--text);margin-bottom:12px;font-weight:900}
 .chat-empty p{font-size:15px;line-height:1.8;max-width:420px;font-weight:500}
-
 .chat-header{
   display:flex;align-items:center;gap:12px;padding:12px 18px;
   background:linear-gradient(180deg,var(--bg-2),rgba(17,22,31,.95));
@@ -315,14 +296,13 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .chat-header .back{display:none}
 @media(max-width:860px){.chat-header .back{display:grid}}
 .chat-header .info{flex:1;min-width:0;cursor:pointer}
-.chat-header .name{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
+.chat-header .name{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chat-header .status{font-size:13px;color:var(--text-dim);margin-top:2px;font-weight:600}
 .chat-header .status.on{color:var(--accent)}
 
 .messages{
   flex:1;overflow-y:auto;padding:22px 44px 14px;position:relative;z-index:1;
   display:flex;flex-direction:column;gap:3px;-webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
 }
 @media(max-width:860px){.messages{padding:18px 14px 10px}}
 .day-div{
@@ -334,65 +314,31 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .msg{
   max-width:72%;padding:9px 14px 7px;border-radius:16px;position:relative;
   word-wrap:break-word;line-height:1.5;font-size:15px;
-  animation:msgIn .22s cubic-bezier(.2,.9,.3,1);
-  box-shadow:0 2px 8px rgba(0,0,0,.15);font-weight:500;
+  animation:msgIn .22s;box-shadow:0 2px 8px rgba(0,0,0,.15);font-weight:500;
 }
 @media(max-width:860px){.msg{max-width:85%}}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
-.msg.me{
-  align-self:flex-end;background:var(--bubble-me);color:var(--bubble-me-t);
-  border-bottom-right-radius:5px;
-}
-.msg.you{
-  align-self:flex-start;background:var(--bubble-you);color:var(--bubble-you-t);
-  border-bottom-left-radius:5px;border:1px solid var(--border);
-}
+.msg.me{align-self:flex-end;background:var(--bubble-me);color:var(--bubble-me-t);border-bottom-right-radius:5px}
+.msg.you{align-self:flex-start;background:var(--bubble-you);color:var(--bubble-you-t);border-bottom-left-radius:5px;border:1px solid var(--border)}
 .msg .txt{white-space:pre-wrap;word-break:break-word}
-.msg .meta{
-  display:flex;align-items:center;gap:5px;justify-content:flex-end;
-  font-size:11.5px;margin-top:4px;opacity:.9;line-height:1;font-weight:700;
-}
-.msg .meta .time{opacity:.85}
-.tick{display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;transition:.2s}
-.tick.pending{color:var(--warn);animation:pulseD 1.5s infinite;font-size:13px}
+.msg .meta{display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11.5px;margin-top:4px;opacity:.9;line-height:1;font-weight:700}
+.tick{display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+.tick.pending{color:var(--warn);font-size:13px}
 .tick.sent{color:var(--tick-grey);font-size:13px;letter-spacing:-2px}
 .tick.delivered{color:var(--tick-grey);font-size:13px;letter-spacing:-2px}
 .tick.read{color:var(--tick-blue);font-size:13px;letter-spacing:-2px}
-.msg.system{
-  align-self:center;background:var(--bg-3);color:var(--text-dim);
-  font-size:13px;padding:7px 16px;border-radius:20px;border:1px solid var(--border);
-  max-width:85%;text-align:center;font-weight:600;
-}
 .msg .msg-img{max-width:100%;max-height:340px;border-radius:11px;display:block;margin:-2px -2px 4px;cursor:pointer}
 .file-msg{display:flex;align-items:center;gap:12px;min-width:200px;padding:4px 0}
-.file-msg .ficon{
-  width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.12);
-  display:grid;place-items:center;font-size:22px;flex-shrink:0;
-}
+.file-msg .ficon{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:22px;flex-shrink:0}
 .file-msg .fname{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .file-msg .fsize{font-size:12px;opacity:.75;margin-top:3px;font-weight:600}
 .voice-msg{display:flex;align-items:center;gap:10px;min-width:200px;padding:3px 0}
-.voice-msg .vbtn{
-  width:42px;height:42px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;display:grid;place-items:center;font-size:16px;flex-shrink:0;
-  box-shadow:0 4px 14px rgba(59,157,255,.4);
-}
+.voice-msg .vbtn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;display:grid;place-items:center;font-size:16px;flex-shrink:0}
 .voice-msg .wave{flex:1;height:26px;display:flex;align-items:center;gap:2px}
-.voice-msg .wave i{display:block;width:3px;background:currentColor;opacity:.6;border-radius:2px;animation:waveA 1s infinite}
-.voice-msg .wave i:nth-child(2n){animation-delay:.15s}
-.voice-msg .wave i:nth-child(3n){animation-delay:.3s}
-@keyframes waveA{0%,100%{height:6px}50%{height:20px}}
+.voice-msg .wave i{display:block;width:3px;background:currentColor;opacity:.6;border-radius:2px}
 .voice-msg .dur{font-size:12.5px;font-weight:800;opacity:.85}
-.typing-ind{
-  align-self:flex-start;background:var(--bubble-you);
-  border:1px solid var(--border);padding:12px 18px;border-radius:16px;
-  border-bottom-left-radius:5px;display:flex;gap:5px;animation:msgIn .22s;
-}
-.typing-ind span{
-  width:8px;height:8px;border-radius:50%;background:var(--text-dim);
-  animation:typeB 1.2s infinite;
-}
+.typing-ind{align-self:flex-start;background:var(--bubble-you);border:1px solid var(--border);padding:12px 18px;border-radius:16px;display:flex;gap:5px}
+.typing-ind span{width:8px;height:8px;border-radius:50%;background:var(--text-dim);animation:typeB 1.2s infinite}
 .typing-ind span:nth-child(2){animation-delay:.15s}
 .typing-ind span:nth-child(3){animation-delay:.3s}
 @keyframes typeB{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
@@ -412,33 +358,27 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   border:1.5px solid var(--border);
 }
 .msg-input:focus{border-color:var(--accent);background:var(--bg-2);box-shadow:0 0 0 4px var(--accent-soft)}
-.msg-input::placeholder{color:var(--text-mut)}
 .send-btn{
   width:48px;height:48px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;display:grid;place-items:center;font-size:19px;flex-shrink:0;
-  box-shadow:0 6px 20px rgba(59,157,255,.45);
 }
-.send-btn:active{transform:scale(.9)}
-.send-btn:disabled{opacity:.4;cursor:not-allowed}
 .attach-menu{
   display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
   padding:16px;background:var(--bg-3);border-radius:16px;
-  margin-bottom:10px;animation:slideDown .25s;border:1px solid var(--border);
+  margin-bottom:10px;border:1px solid var(--border);
 }
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 .attach-btn{
   display:flex;flex-direction:column;align-items:center;gap:8px;
   padding:14px 8px;border-radius:12px;background:var(--bg-2);
-  font-size:12.5px;font-weight:800;color:var(--text-dim);transition:.2s;
+  font-size:12.5px;font-weight:800;color:var(--text-dim);
   border:1px solid var(--border);
 }
-.attach-btn:hover{background:var(--bg-4);color:var(--text);border-color:var(--accent)}
 .attach-btn .ic{font-size:24px}
 .recording-bar{
   display:flex;align-items:center;gap:14px;padding:12px 18px;
-  background:linear-gradient(135deg,rgba(255,77,94,.15),rgba(255,77,94,.05));
-  border:1.5px solid rgba(255,77,94,.4);border-radius:14px;margin-bottom:10px;
+  background:rgba(255,77,94,.15);border:1.5px solid rgba(255,77,94,.4);
+  border-radius:14px;margin-bottom:10px;
 }
 .recording-bar .dot-rec{width:12px;height:12px;border-radius:50%;background:var(--danger);animation:pulseD 1s infinite}
 .recording-bar .rec-time{font-weight:900;font-size:17px;color:var(--danger)}
@@ -447,65 +387,40 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
 .recording-bar .rec-btn.cancel{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
 .recording-bar .rec-btn.send{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
 
-.modal-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
-  z-index:700;display:grid;place-items:center;padding:16px;overflow-y:auto;
-}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:700;display:grid;place-items:center;padding:16px;overflow-y:auto}
 .modal{
   background:linear-gradient(180deg,var(--bg-2),var(--bg-3));
   border:1px solid var(--border);border-radius:22px;padding:28px;
   width:100%;max-width:440px;box-shadow:0 12px 40px rgba(0,0,0,.55);
-  animation:pop .25s;max-height:calc(100vh - 40px);overflow-y:auto;position:relative;
+  max-height:calc(100vh - 40px);overflow-y:auto;
 }
-@keyframes pop{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:none;opacity:1}}
-.modal h2{font-size:22px;font-weight:900;margin-bottom:8px;letter-spacing:-.5px}
+.modal h2{font-size:22px;font-weight:900;margin-bottom:8px}
 .modal .msub{color:var(--text-dim);font-size:14px;margin-bottom:22px;line-height:1.6;font-weight:500}
 .modal .actions{display:flex;gap:10px;margin-top:10px}
 .modal .actions .btn{flex:1}
 .id-display{
   background:linear-gradient(135deg,var(--bg-3),var(--bg-4));
   border:2px dashed var(--accent);border-radius:16px;padding:20px;
-  text-align:center;margin-bottom:16px;position:relative;overflow:hidden;
+  text-align:center;margin-bottom:16px;
 }
 .id-display .id-label{font-size:12px;color:var(--text-dim);font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
-.id-display .id-value{
-  font-size:28px;font-weight:900;color:var(--accent);
-  font-family:ui-monospace,SFMono-Regular,monospace;letter-spacing:.5px;
-  text-shadow:0 0 20px rgba(59,157,255,.5);
-}
+.id-display .id-value{font-size:28px;font-weight:900;color:var(--accent);font-family:ui-monospace,monospace;letter-spacing:.5px}
 .id-display .id-actions{display:flex;gap:10px;margin-top:14px}
-.id-display .id-actions button{
-  flex:1;padding:11px;border-radius:10px;font-weight:800;font-size:13.5px;
-  background:var(--bg-2);border:1px solid var(--border);
-}
-.id-display .id-actions button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.id-display .id-actions button{flex:1;padding:11px;border-radius:10px;font-weight:800;font-size:13.5px;background:var(--bg-2);border:1px solid var(--border)}
 
-/* ✅ CLOUD INDICATOR — CENTER */
 .cloud-indicator{
   position:fixed;top:calc(10px + var(--safe-top));left:50%;transform:translateX(-50%);
   z-index:950;background:var(--bg-2);border:1px solid var(--border);
   border-radius:20px;padding:7px 14px;font-size:12px;font-weight:800;
   color:var(--text-dim);display:flex;align-items:center;gap:7px;
-  box-shadow:0 4px 16px rgba(0,0,0,.4);transition:.2s;
   pointer-events:none;
 }
 .cloud-indicator.on{color:var(--accent);border-color:rgba(59,157,255,.4);background:rgba(59,157,255,.08)}
 .cloud-indicator .cdot{width:8px;height:8px;border-radius:50%;background:var(--text-mut)}
-.cloud-indicator.on .cdot{background:var(--accent);box-shadow:0 0 8px var(--accent)}
-.cloud-indicator.sync .cdot{background:var(--warn);animation:pulseD 1s infinite}
+.cloud-indicator.on .cdot{background:var(--accent)}
 
-#toasts{
-  position:fixed;bottom:calc(26px + var(--safe-bottom));left:50%;
-  transform:translateX(-50%);z-index:900;display:flex;flex-direction:column;
-  gap:10px;align-items:center;pointer-events:none;padding:0 12px;max-width:100%;
-}
-.toast{
-  background:var(--bg-2);border:1px solid var(--border);
-  border-left:4px solid var(--accent);
-  padding:14px 22px;border-radius:14px;font-size:14px;font-weight:700;
-  box-shadow:0 12px 40px rgba(0,0,0,.55);animation:toastIn .3s;
-  max-width:92vw;word-break:break-word;
-}
+#toasts{position:fixed;bottom:calc(26px + var(--safe-bottom));left:50%;transform:translateX(-50%);z-index:900;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;padding:0 12px;max-width:100%}
+.toast{background:var(--bg-2);border:1px solid var(--border);border-left:4px solid var(--accent);padding:14px 22px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:toastIn .3s;max-width:92vw}
 .toast.err{border-left-color:var(--danger)}
 .toast.info{border-left-color:#22d3ee}
 @keyframes toastIn{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
@@ -516,13 +431,10 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   .card{padding:24px 20px}
   .chat-header{padding:10px 12px}
   .chat-header .avatar{width:40px;height:40px;font-size:16px}
-  .chat-header .name{font-size:15px}
-  .chat-header .status{font-size:11.5px}
   .icon-btn{width:40px;height:40px;font-size:17px}
   .msg{max-width:88%}
   .messages{padding:14px 10px 8px}
   .id-display .id-value{font-size:24px}
-  .cloud-indicator{font-size:11px;padding:5px 11px}
 }
 </style>
 </head>
@@ -533,7 +445,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   <span id="cloudText">Cloud</span>
 </div>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-wrap">
     <div class="brand">
@@ -549,7 +460,7 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
       <div class="field">
         <label>Your Unique ID</label>
         <input id="inpId" type="text" placeholder="ali-1234" maxlength="20" autocomplete="off" spellcheck="false">
-        <div class="hint">Sirf <b>a-z, 0-9, -</b> use karein. Dost isi ID se aap ko dhoondenge.</div>
+        <div class="hint">Sirf <b>a-z, 0-9, -</b> use karein.</div>
       </div>
       <div class="field">
         <label>Avatar Color</label>
@@ -566,7 +477,6 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hide">
   <aside class="sidebar">
     <div class="side-head">
@@ -577,27 +487,23 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
           <span id="myIdTxt">---</span><span>📋</span>
         </div>
       </div>
-      <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+      <button class="icon-btn" id="themeBtn">🌙</button>
     </div>
-
     <div class="tabs">
       <button class="tab on" id="tabChats" onclick="switchTab('chats')">💬 Chats <span class="badge" id="chatsBadge">0</span></button>
       <button class="tab" id="tabGroups" onclick="switchTab('groups')">👥 Groups <span class="badge" id="groupsBadge">0</span></button>
     </div>
-
     <div class="search-wrap" id="searchWrap">
       <div class="search-inner">
         <input id="searchId" type="text" placeholder="Dost ki ID likhein..." autocomplete="off">
         <button id="connectBtn" onclick="connectToUser()">Connect</button>
       </div>
     </div>
-
     <div class="chat-list" id="chatList"></div>
-
     <div class="side-head" style="border-top:1px solid var(--border);justify-content:space-around;padding:10px">
-      <button class="icon-btn" onclick="openFindPeople()" title="Find">🔍</button>
-      <button class="icon-btn" onclick="openMyIdCard()" title="My ID">🆔</button>
-      <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+      <button class="icon-btn" onclick="openFindPeople()">🔍</button>
+      <button class="icon-btn" onclick="openMyIdCard()">🆔</button>
+      <button class="icon-btn" onclick="openSettings()">⚙️</button>
     </div>
   </aside>
 
@@ -605,9 +511,8 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
     <div class="chat-empty" id="chatEmpty">
       <div class="ic">💬</div>
       <h2>Welcome to WaqarChat</h2>
-      <p>Dost offline ho to bhi message <b style="color:var(--accent)">cloud ke through</b> pahunchega. Jab wo online hoga, message milega aur <b style="color:var(--accent)">cloud se turant delete</b>. 🔒</p>
+      <p>Dost ki ID search karein aur Connect dabayein.</p>
     </div>
-
     <div class="chat-header hide" id="chatHeader">
       <button class="icon-btn back" onclick="closeChatMobile()">←</button>
       <div class="avatar" id="chatAv" onclick="openChatInfo()">?<span class="sdot" id="chatSdot"></span></div>
@@ -615,11 +520,9 @@ body.light .brand h1{background:linear-gradient(135deg,#0d1219,#1e7be0);-webkit-
         <div class="name" id="chatName">---</div>
         <div class="status" id="chatStatus">Offline</div>
       </div>
-      <button class="icon-btn" onclick="openChatMenu()" title="Menu">⋮</button>
+      <button class="icon-btn" onclick="openChatMenu()">⋮</button>
     </div>
-
     <div class="messages hide" id="messages"></div>
-
     <div class="input-bar hide" id="inputBar">
       <div class="recording-bar hide" id="recordingBar">
         <span class="dot-rec"></span>
@@ -774,7 +677,7 @@ function startCloudListener(){
 }
 
 /* =====================================================================
-   MAIN LOGIC
+   MAIN
    ===================================================================== */
 const PREFIX = 'waqarchat-v3-';
 const LS = {
@@ -819,7 +722,7 @@ function toast(msg, type='ok'){
   t.className = 'toast' + (type==='err'?' err':type==='info'?' info':'');
   t.textContent = msg;
   $('#toasts').appendChild(t);
-  setTimeout(()=>{ t.style.transition='opacity .3s,transform .3s'; t.style.opacity='0'; t.style.transform='translateY(20px)'; setTimeout(()=>t.remove(),320); }, 3000);
+  setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),320); }, 3000);
 }
 function avatarHTML(id, name, opts={}){
   const color = opts.color || pickColor(id);
@@ -827,10 +730,10 @@ function avatarHTML(id, name, opts={}){
   return `<div class="avatar" style="background:${color};${opts.size?`width:${opts.size}px;height:${opts.size}px;font-size:${opts.size*0.4}px`:''}">${initial}${opts.extra||''}</div>`;
 }
 function tickHTML(status){
-  if(status === 'pending') return `<span class="tick pending" title="Pending">⏳</span>`;
-  if(status === 'read') return `<span class="tick read" title="Read">✓✓</span>`;
-  if(status === 'delivered') return `<span class="tick delivered" title="Delivered">✓✓</span>`;
-  return `<span class="tick sent" title="Sent">✓</span>`;
+  if(status === 'pending') return `<span class="tick pending">⏳</span>`;
+  if(status === 'read') return `<span class="tick read">✓✓</span>`;
+  if(status === 'delivered') return `<span class="tick delivered">✓✓</span>`;
+  return `<span class="tick sent">✓</span>`;
 }
 function tickMiniHTML(status){
   if(status === 'read') return `<span class="tick-mini read">✓✓</span>`;
@@ -839,23 +742,31 @@ function tickMiniHTML(status){
   return `<span class="tick-mini">✓</span>`;
 }
 
-/* ============ LOGIN ============ */
+/* ============ AUTO-LOGIN ============ */
 let selectedAvColor = AV_COLORS[0];
+
 document.addEventListener('DOMContentLoaded', ()=>{
   $('#avPicker').innerHTML = AV_COLORS.map((c,i)=>
     `<div class="avatar-opt ${i===0?'on':''}" style="background:${c}" data-c="${c}" onclick="pickAvColor('${c}',this)"></div>`
   ).join('');
   
-  // ✅ IMPORTANT: Purani ID yaad rakho — nayi NAHI banao
+  // ✅ Purani ID check karo
   if(me && me.id){
+    console.log('✅ Purani ID mili:', me.id);
     $('#inpName').value = me.name || '';
     $('#inpId').value = me.id || '';
     if(me.color){
       selectedAvColor = me.color;
       $$('.avatar-opt').forEach(el=>el.classList.toggle('on', el.dataset.c === me.color));
     }
+    // ✅ AUTO-LOGIN — 300ms baad khud
+    setTimeout(()=>{
+      if(me && me.id && me.name){
+        console.log('🚀 Auto-login:', me.id);
+        doLogin();
+      }
+    }, 300);
   } else {
-    // Pehli dafa — nayi ID suggest karo
     $('#inpId').value = 'user-' + Math.floor(1000 + Math.random()*9000);
   }
   
@@ -863,6 +774,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   ['inpName','inpId'].forEach(id=>{ $('#'+id).addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); }); });
   $('#filePick').addEventListener('change', handleFilePick);
 });
+
 function pickAvColor(c, el){ selectedAvColor = c; $$('.avatar-opt').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
 function slugify(s){ return String(s||'').toLowerCase().trim().replace(/[^a-z0-9\-]/g,'').replace(/-+/g,'-').slice(0,20); }
 
@@ -871,17 +783,22 @@ async function doLogin(){
   let id = slugify($('#inpId').value);
   if(!name){ toast('Naam likhein','err'); $('#inpName').focus(); return; }
   if(!id || id.length<3){ id = 'user-'+Math.floor(1000+Math.random()*9000); $('#inpId').value = id; }
+  
   me = { id, name, color: selectedAvColor };
   LS.set('me', me);
+  console.log('💾 Saved:', me.id);
+  
   $('#loginBtn').disabled = true;
   $('#loginBtn').textContent = '⏳ Connecting...';
   $('#statusRow').classList.remove('hide');
   $('#statusDot').className = 'dot wait';
-  $('#statusText').textContent = 'Cloud connect ho raha hai...';
+  $('#statusText').textContent = 'Connecting...';
+  
   if('Notification' in window && Notification.permission === 'default'){
     try{ await Notification.requestPermission(); }catch(e){}
   }
   notifyEnabled = ('Notification' in window && Notification.permission === 'granted');
+  
   initFirebase();
   startPeer();
 }
@@ -899,7 +816,7 @@ function startPeer(){
   peer.on('open', ()=>{
     $('#statusDot').className = 'dot on';
     $('#statusText').textContent = 'Online!';
-    setTimeout(enterApp, 400);
+    setTimeout(enterApp, 300);
   });
   peer.on('connection', conn => setupDataConnection(conn, false));
   peer.on('error', err => {
@@ -908,13 +825,13 @@ function startPeer(){
       const newId = 'user-' + Math.floor(1000+Math.random()*9000);
       $('#inpId').value = newId;
       $('#statusDot').className = 'dot off';
-      $('#statusText').textContent = 'Yeh ID already use mein hai. Doosri try karein.';
+      $('#statusText').textContent = 'Yeh ID already use mein hai.';
       $('#loginBtn').disabled = false;
       $('#loginBtn').textContent = '🚀 Start Chatting';
-      toast('Yeh ID use mein hai — koi aur ID likhein','err');
+      toast('Yeh ID use mein hai — doosri likhein','err');
     } else if(t === 'network'){
       $('#statusDot').className = 'dot off';
-      $('#statusText').textContent = 'Peer server issue';
+      $('#statusText').textContent = 'Server issue';
       $('#loginBtn').disabled = false;
       $('#loginBtn').textContent = '🔄 Retry';
     }
@@ -931,13 +848,26 @@ async function enterApp(){
   $('#myIdTxt').textContent = me.id;
   document.body.classList.toggle('light', LS.get('theme','dark')==='light');
   updateThemeBtn();
+  
+  // ✅ Saari chats load karo
   renderChatList();
+  
+  // ✅ Cloud se purane messages fetch karo
   if(cloudReady){
     const pending = await cloudFetchAndDelete(me.id);
     absorbMessages(pending);
     startCloudListener();
   }
+  
+  // ✅ Har chat ke messages local se already load hain
   setTimeout(flushAllPending, 2000);
+  
+  // ✅ Auto-open last chat (agar tha)
+  const lastChat = LS.get('lastChat', null);
+  if(lastChat && chats[lastChat]){
+    console.log('📂 Last chat khola:', lastChat);
+    setTimeout(()=>openChat(lastChat), 500);
+  }
 }
 
 function absorbMessages(msgs){
@@ -975,7 +905,6 @@ function setupDataConnection(conn, outgoing, forcedId){
     renderChatList();
     if(currentChat === userId){ updateChatHeader(); renderMessages(); }
     flushPendingMessages(userId);
-    toast(userId + ' online ✅', 'info');
   });
   conn.on('data', data => handleIncoming(data, userId, conn));
   conn.on('close', ()=>{
@@ -1010,18 +939,6 @@ function flushPendingMessages(chatId){
   LS.set('pendingQueue', pendingQueue);
 }
 function flushAllPending(){ Object.keys(pendingQueue).forEach(id=>{ if(connections[id]?.open) flushPendingMessages(id); }); }
-function retryMessage(chatId, ts){
-  const conn = connections[chatId];
-  if(!conn || !conn.open){ toast('Dost offline — cloud se jayega','info'); return; }
-  const msg = chats[chatId]?.messages.find(m => m.ts === ts);
-  if(!msg) return;
-  if(msg.kind === 'text') conn.send({ type:'msg', text: msg.text, ts: msg.ts });
-  else conn.send({ type: msg.kind, ...msg });
-  msg.status = 'sent';
-  if(pendingQueue[chatId]){ pendingQueue[chatId] = pendingQueue[chatId].filter(m => m.ts !== ts); LS.set('pendingQueue', pendingQueue); }
-  LS.set('chats', chats);
-  renderMessages();
-}
 
 function handleIncoming(data, fromId, conn){
   if(!data) return;
@@ -1094,6 +1011,7 @@ function switchTab(tab){
   $('#searchWrap').classList.toggle('hide', tab!=='chats');
   renderChatList();
 }
+
 function renderChatList(){
   const list = $('#chatList');
   const all = Object.entries(chats).filter(([id,c])=> activeTab==='groups' ? c.type==='group' : c.type!=='group');
@@ -1136,63 +1054,165 @@ function renderChatList(){
   }).join('');
 }
 
-/* ✅ OPEN CHAT — FIXED FOR MOBILE + LOAD MESSAGES */
+/* ✅ OPEN CHAT — WhatsApp Style: instant load */
 function openChat(id){
   if(!id){ toast('Chat ID missing','err'); return; }
+  
+  // ✅ STEP 1: localStorage se chats DOBARA load karo (yahi asal fix hai)
+  try {
+    const stored = localStorage.getItem('wc_chats');
+    if(stored){
+      const parsed = JSON.parse(stored);
+      if(parsed && typeof parsed === 'object'){
+        chats = parsed;
+      }
+    }
+  } catch(e) { console.error('Reload err:', e); }
+  
   currentChat = id;
-  if(!chats[id]) chats[id] = { type:'dm', name:id, messages:[], unread:0, lastSeen:now() };
+  LS.set('lastChat', id);
+  
+  if(!chats[id]) {
+    chats[id] = { type:'dm', name:id, messages:[], unread:0, lastSeen:now() };
+  }
   chats[id].unread = 0;
   LS.set('chats', chats);
 
-  // Show chat UI
   $('#chatEmpty').classList.add('hide');
   $('#chatHeader').classList.remove('hide');
   $('#messages').classList.remove('hide');
   $('#inputBar').classList.remove('hide');
-
-  // Mobile layout
   $('#app').classList.add('chatOpen');
 
-  // ✅ Load messages FIRST
   updateChatHeader();
-  renderMessages();
+  
+  // ✅ STEP 2: FORCE RENDER — bar bar try karo
+  const forceRender = () => {
+    const box = document.getElementById('messages');
+    if(!box) return;
+    const c = chats[currentChat];
+    if(!c) return;
+    
+    if(!c.messages || c.messages.length === 0){
+      box.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein</span></div>';
+      return;
+    }
+    
+    let html = '', lastDay = '';
+    c.messages.forEach(m => {
+      const day = dayLabel(m.ts);
+      if(day !== lastDay){ html += '<div class="day-div">' + esc(day) + '</div>'; lastDay = day; }
+      if(m.from === 'system'){ html += '<div class="msg system">' + esc(m.text) + '</div>'; return; }
+      const isMe = m.from === 'me';
+      const cls = isMe ? 'me' : 'you';
+      const tick = isMe ? tickHTML(m.status || 'sent') : '';
+      let content = '';
+      if(m.kind === 'image') content = '<img src="' + esc(m.data) + '" class="msg-img" onclick="viewImage(\'' + esc(m.data) + '\')">';
+      else if(m.kind === 'file') content = '<div class="file-msg"><div class="ficon">📎</div><div><div class="fname">' + esc(m.name) + '</div><div class="fsize">' + fmtSize(m.size||0) + '</div></div></div>';
+      else if(m.kind === 'voice'){
+        const vid = 'v-' + m.ts;
+        content = '<div class="voice-msg" data-src="' + esc(m.data) + '" id="' + vid + '"><button class="vbtn" onclick="playVoice(\'' + vid + '\',this)">▶</button><div class="wave">' + Array.from({length:12}).map(()=>'<i style="height:' + (6+Math.random()*14) + 'px"></i>').join('') + '</div><span class="dur">' + fmtSec(m.duration||0) + '</span></div>';
+      }
+      else content = '<div class="txt">' + esc(m.text||'') + '</div>';
+      html += '<div class="msg ' + cls + '">' + content + '<div class="meta"><span>' + timeStr(m.ts) + '</span>' + tick + '</div></div>';
+    });
+    box.innerHTML = html;
+    box.scrollTop = box.scrollHeight;
+  };
+  
+  // 5 baar force render — timing issue khatam
+  forceRender();
+  requestAnimationFrame(forceRender);
+  setTimeout(forceRender, 30);
+  setTimeout(forceRender, 100);
+  setTimeout(forceRender, 300);
+  setTimeout(forceRender, 600);
+  
   renderChatList();
+  setTimeout(() => { try { document.getElementById('msgInput').focus(); } catch(e){} }, 400);
 
-  // Focus input after
-  setTimeout(()=>{ try{ $('#msgInput').focus(); }catch(e){} }, 300);
-
-  // Read receipts
   const c = connections[id];
   if(c && c.open){
-    chats[id].messages.forEach(m=>{ if(m.from==='them') m.read=true; });
+    chats[id].messages.forEach(m => { if(m.from === 'them') m.read = true; });
     LS.set('chats', chats);
-    try{ c.send({ type:'read' }); }catch(e){}
+    try { c.send({ type:'read' }); } catch(e){}
+  }
+  
+  // Cloud fetch (jo undelivered hain)
+  if(cloudReady && db){
+    setTimeout(async () => {
+      try {
+        const snap = await db.collection(MSG_COLLECTION)
+          .where('to','==', me.id)
+          .where('from','==', id)
+          .get();
+        if(!snap.empty){
+          const batch = db.batch();
+          let added = 0;
+          snap.forEach(doc => {
+            const d = doc.data();
+            const exists = chats[id].messages.some(m => m.ts === d.ts && m.from === 'them');
+            if(!exists){
+              chats[id].messages.push({
+                from:'them', senderId:d.from, senderName:d.fromName,
+                kind: d.kind || 'text', text: d.text, ts: d.ts,
+                data: d.data, name: d.name, size: d.size, duration: d.duration,
+                read: true, status:'delivered'
+              });
+              added++;
+            }
+            batch.delete(doc.ref);
+          });
+          if(added > 0){
+            chats[id].messages.sort((a,b)=>a.ts - b.ts);
+            LS.set('chats', chats);
+            forceRender();
+          }
+          await batch.commit();
+        }
+      } catch(e){ console.log('Cloud fetch:', e); }
+    }, 300);
   }
 }
 function closeChatMobile(){
   $('#app').classList.remove('chatOpen');
-  currentChat = null;
 }
+
 function updateChatHeader(){
   if(!currentChat) return;
   const c = chats[currentChat];
+  if(!c) return;
   const name = c.name || currentChat;
   const isOnline = online.has(currentChat);
-  const av = $('#chatAv');
-  av.textContent = name[0].toUpperCase();
-  av.style.background = c.color || pickColor(currentChat);
-  $('#chatSdot').className = 'sdot' + (isOnline?' on':'');
-  $('#chatName').textContent = name;
-  $('#chatStatus').textContent = isOnline ? 'Online' : 'Offline';
-  $('#chatStatus').className = 'status' + (isOnline?' on':'');
+  
+  // ✅ Har element ko safely access karo
+  const av = document.getElementById('chatAv');
+  if(av){
+    av.textContent = name[0].toUpperCase();
+    av.style.background = c.color || pickColor(currentChat);
+  }
+  
+  const sdot = document.getElementById('chatSdot');
+  if(sdot) sdot.className = 'sdot' + (isOnline ? ' on' : '');
+  
+  const nameEl = document.getElementById('chatName');
+  if(nameEl) nameEl.textContent = name;
+  
+  const statusEl = document.getElementById('chatStatus');
+  if(statusEl){
+    statusEl.textContent = isOnline ? 'Online' : 'Offline';
+    statusEl.className = 'status' + (isOnline ? ' on' : '');
+  }
 }
-
+/* ✅ RENDER MESSAGES — Force refresh */
 function renderMessages(){
   if(!currentChat) return;
   const c = chats[currentChat];
   const box = $('#messages');
+  if(!box) return;
+  
   if(!c || !c.messages || !c.messages.length){
-    box.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein aur Enter dabayein</span></div>`;
+    box.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:14.5px;padding:60px 20px;font-weight:600">Chat shuru karein 👋<br><span style="font-size:13.5px;opacity:.7;margin-top:8px;display:block">Message likhein</span></div>`;
     return;
   }
   let html = '', lastDay = '';
@@ -1211,7 +1231,7 @@ function renderMessages(){
       contentHTML = `<div class="voice-msg" data-src="${esc(m.data)}" id="${id}"><button class="vbtn" onclick="playVoice('${id}',this)">▶</button><div class="wave">${Array.from({length:12}).map(()=>`<i style="height:${6+Math.random()*14}px"></i>`).join('')}</div><span class="dur">${fmtSec(m.duration||0)}</span></div>`;
     }
     else contentHTML = `<div class="txt">${esc(m.text||'')}</div>`;
-    html += `<div class="msg ${cls}">${contentHTML}<div class="meta"><span class="time">${timeStr(m.ts)}</span>${tick}</div></div>`;
+    html += `<div class="msg ${cls}">${contentHTML}<div class="meta"><span>${timeStr(m.ts)}</span>${tick}</div></div>`;
   });
   box.innerHTML = html;
   box.scrollTop = box.scrollHeight;
@@ -1231,8 +1251,7 @@ async function sendMessage(){
   } else {
     msg.status = 'sent';
   }
-  const cloudOk = await cloudSendMessage(msg, currentChat);
-  if(cloudOk && !(conn && conn.open)) toast('☁️ Cloud pe saved', 'info');
+  await cloudSendMessage(msg, currentChat);
   c.messages.push(msg);
   c.lastSeen = now();
   LS.set('chats', chats);
@@ -1352,12 +1371,10 @@ function connectToUser(){
   if(connections[target]){ openChat(target); return; }
   const btn = $('#connectBtn');
   btn.disabled = true; btn.textContent = '⏳';
-  toast('🔎 ' + target + ' dhoond rahe hain...','info');
   const conn = peer.connect(PREFIX + target, { reliable:true });
   const to = setTimeout(()=>{
     try{ conn.close(); }catch(e){}
     btn.disabled = false; btn.textContent = 'Connect';
-    toast('Dost offline — message cloud se jayega ✅','info');
     if(!chats[target]) chats[target] = { type:'dm', name:target, messages:[], unread:0, lastSeen:now() };
     LS.set('chats', chats);
     renderChatList();
@@ -1373,18 +1390,17 @@ function connectToUser(){
   conn.on('error', ()=>{
     clearTimeout(to);
     btn.disabled = false; btn.textContent = 'Connect';
-    toast('Connect fail','err');
   });
 }
 document.addEventListener('DOMContentLoaded', ()=>{
   $('#searchId').addEventListener('keydown', e=>{ if(e.key==='Enter') connectToUser(); });
 });
 
-function copyMyId(){ navigator.clipboard.writeText(me.id).then(()=>toast('✅ ID copy ho gayi!')); }
+function copyMyId(){ navigator.clipboard.writeText(me.id).then(()=>toast('✅ ID copy!')); }
 function openMyIdCard(){
   openModal(`
     <h2>🆔 Aap Ki ID</h2>
-    <p class="msub">Yeh ID doston ko bhejein taake wo aap ko add kar sakein</p>
+    <p class="msub">Yeh ID doston ko bhejein</p>
     <div class="id-display">
       <div class="id-label">Your WaqarChat ID</div>
       <div class="id-value">${esc(me.id)}</div>
@@ -1393,26 +1409,17 @@ function openMyIdCard(){
         <button onclick="shareMyId()">↗️ Share</button>
       </div>
     </div>
-    <div style="background:var(--bg-3);padding:14px;border-radius:12px;font-size:13.5px;color:var(--text-dim);line-height:1.8;font-weight:500">
-      <b style="color:var(--accent)">💡 Kaise use karein:</b><br>
-      1. Yeh ID dost ko bhejein<br>
-      2. Dost WaqarChat kholega<br>
-      3. Search mein yeh ID daalega<br>
-      4. Connect dabayega → chat shuru! ✅
-    </div>
-    <button class="btn btn-ghost btn-block" style="margin-top:16px" onclick="closeModal()">Close</button>
+    <button class="btn btn-ghost btn-block" onclick="closeModal()">Close</button>
   `);
 }
 function shareMyId(){
-  const text = `WaqarChat pe mujhe add karein! Meri ID: ${me.id}`;
-  if(navigator.share) navigator.share({ title: 'WaqarChat ID', text }).catch(()=>{});
-  else navigator.clipboard.writeText(text).then(()=>toast('✅ Copy ho gaya'));
+  const text = `WaqarChat pe add karein! Meri ID: ${me.id}`;
+  if(navigator.share) navigator.share({ title: 'WaqarChat', text }).catch(()=>{});
+  else navigator.clipboard.writeText(text).then(()=>toast('✅ Copy!'));
 }
-
 function openProfile(){
   openModal(`
     <h2>👤 Profile</h2>
-    <p class="msub">Aap ka naam aur ID</p>
     <div style="text-align:center;margin-bottom:20px">
       <div class="avatar" style="background:${me.color};width:90px;height:90px;font-size:38px;margin:0 auto;border-radius:24px">${esc(me.name[0].toUpperCase())}</div>
     </div>
@@ -1433,8 +1440,12 @@ function saveProfile(){
   $('#myAv').textContent = me.name[0].toUpperCase();
   closeModal(); toast('✅ Save');
 }
-function logout(){ if(!confirm('Logout? Aap ki ID aur chats safe rahengi.')) return; try{ peer.destroy(); }catch(e){} if(cloudUnsubscribe){ try{cloudUnsubscribe();}catch(e){} } location.reload(); }
-
+function logout(){ 
+  if(!confirm('Logout? Aap ki ID aur chats safe rahengi.')) return; 
+  try{ peer.destroy(); }catch(e){} 
+  if(cloudUnsubscribe){ try{cloudUnsubscribe();}catch(e){} } 
+  location.reload(); 
+}
 function openSettings(){
   openModal(`
     <h2>⚙️ Settings</h2>
@@ -1445,25 +1456,20 @@ function openSettings(){
         <button class="btn ${document.body.classList.contains('light')?'btn-primary':'btn-ghost'}" style="flex:1" onclick="setTheme('light')">☀️ Light</button>
       </div>
     </div>
-    <div class="field"><label>Install App</label>
-      <button class="btn btn-primary btn-block" onclick="installPWA()">📲 Install WaqarChat</button>
-    </div>
     <div class="credit" style="padding:10px 0">Created by <b>Waqar Ahmed</b></div>
     <div class="actions">
       <button class="btn btn-ghost" onclick="closeModal()">Close</button>
-      <button class="btn btn-danger" onclick="clearAll()">🗑 Reset</button>
+      <button class="btn btn-danger" onclick="clearAll()">🗑 Reset All</button>
     </div>
   `);
 }
 function setTheme(t){ document.body.classList.toggle('light', t==='light'); LS.set('theme', t); updateThemeBtn(); closeModal(); }
 function updateThemeBtn(){ $('#themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; }
 $('#themeBtn').addEventListener('click', ()=>{ setTheme(document.body.classList.contains('light')?'dark':'light'); });
-function clearAll(){ if(!confirm('Sab delete? Aap ki ID bhi gayab ho jayegi.')) return; localStorage.clear(); location.reload(); }
-
+function clearAll(){ if(!confirm('Sab delete? ID bhi gayab ho jayegi.')) return; localStorage.clear(); location.reload(); }
 function openFindPeople(){
   openModal(`
     <h2>🔍 Find People</h2>
-    <p class="msub">Dost ki ID likhein</p>
     <div class="field"><input id="findId" type="text" placeholder="ali-1234"></div>
     <div class="actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
@@ -1473,43 +1479,38 @@ function openFindPeople(){
   setTimeout(()=>$('#findId').focus(), 150);
 }
 function doFind(){ const id = slugify($('#findId').value); if(!id) return; closeModal(); $('#searchId').value = id; switchTab('chats'); connectToUser(); }
-
 function openChatMenu(){
   if(!currentChat) return;
   openModal(`
     <h2>Chat Options</h2>
     <p class="msub">${esc(chats[currentChat].name||currentChat)}</p>
     <div style="display:grid;gap:8px">
-      <button class="btn btn-ghost" onclick="closeModal();openChatInfo()" style="justify-content:flex-start">ℹ️ Chat Info</button>
-      <button class="btn btn-ghost" onclick="closeModal();clearChat()" style="justify-content:flex-start">🗑 Clear Local</button>
+      <button class="btn btn-ghost" onclick="closeModal();openChatInfo()" style="justify-content:flex-start">ℹ️ Info</button>
+      <button class="btn btn-ghost" onclick="closeModal();clearChat()" style="justify-content:flex-start">🗑 Clear</button>
       <button class="btn btn-danger" onclick="closeModal();deleteChat()" style="justify-content:flex-start;color:#fff">❌ Delete</button>
     </div>
     <button class="btn btn-ghost btn-block" style="margin-top:14px" onclick="closeModal()">Cancel</button>
   `);
 }
-function clearChat(){ if(!currentChat) return; if(!confirm('Local messages delete?')) return; chats[currentChat].messages=[]; LS.set('chats',chats); renderMessages(); renderChatList(); }
-function deleteChat(){ if(!currentChat) return; if(!confirm('Poori chat delete?')) return; delete chats[currentChat]; LS.set('chats',chats); closeChatMobile(); $('#chatEmpty').classList.remove('hide'); $('#chatHeader').classList.add('hide'); $('#messages').classList.add('hide'); $('#inputBar').classList.add('hide'); renderChatList(); }
+function clearChat(){ if(!currentChat) return; if(!confirm('Delete messages?')) return; chats[currentChat].messages=[]; LS.set('chats',chats); renderMessages(); renderChatList(); }
+function deleteChat(){ if(!currentChat) return; if(!confirm('Delete chat?')) return; delete chats[currentChat]; LS.set('chats',chats); closeChatMobile(); $('#chatEmpty').classList.remove('hide'); $('#chatHeader').classList.add('hide'); $('#messages').classList.add('hide'); $('#inputBar').classList.add('hide'); renderChatList(); }
 function openChatInfo(){
   if(!currentChat) return;
   const c = chats[currentChat];
   openModal(`
-    <h2>ℹ️ Chat Info</h2>
-    <p class="msub">${esc(c.name)}</p>
+    <h2>ℹ️ Info</h2>
     <div style="text-align:center;margin-bottom:16px">${avatarHTML(currentChat, c.name, {size:80})}</div>
-    <div class="field"><label>User ID</label><input type="text" value="${esc(currentChat)}" readonly onclick="this.select()"></div>
+    <div class="field"><label>ID</label><input type="text" value="${esc(currentChat)}" readonly onclick="this.select()"></div>
     <div class="field"><label>Status</label>
       <div style="padding:10px 14px;background:var(--bg-3);border-radius:10px;font-weight:600">
-        ${online.has(currentChat)?'<span style="color:var(--accent)">● Online</span>':'○ Offline — cloud se aayega'}
+        ${online.has(currentChat)?'<span style="color:var(--accent)">● Online</span>':'○ Offline'}
       </div>
     </div>
     <button class="btn btn-ghost btn-block" onclick="closeModal()">Close</button>
   `);
 }
-function openEmoji(){ toast('Emoji picker jald','info'); }
-
-function openModal(html){
-  $('#modalRoot').innerHTML = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`;
-}
+function openEmoji(){ toast('Emoji jald','info'); }
+function openModal(html){ $('#modalRoot').innerHTML = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`; }
 function closeModal(){ $('#modalRoot').innerHTML = ''; }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 document.addEventListener('click', e=>{
@@ -1524,29 +1525,6 @@ function showNotification(title, body, onclick){
     n.onclick = ()=>{ window.focus(); if(onclick) onclick(); n.close(); };
   }catch(e){}
 }
-
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-function installPWA(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(c => {
-      if(c.outcome === 'accepted') toast('✅ App install ho gayi!');
-      deferredPrompt = null;
-    });
-  } else {
-    toast('Browser menu → Add to Home Screen','info');
-  }
-}
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW:', err));
-  });
-}
-
 window.addEventListener('beforeunload', ()=>{
   Object.values(connections).forEach(c=>{ try{ c.close(); }catch(e){} });
   try{ peer && peer.destroy(); }catch(e){}
@@ -1561,11 +1539,6 @@ window.addEventListener('focus', async ()=>{
   if(!cloudReady || !me) return;
   const pending = await cloudFetchAndDelete(me.id);
   if(pending.length) absorbMessages(pending);
-});
-window.addEventListener('load', ()=>{
-  const params = new URLSearchParams(location.search);
-  const autoId = params.get('id');
-  if(autoId && !me) $('#searchId').value = autoId;
 });
 </script>
 </body>
