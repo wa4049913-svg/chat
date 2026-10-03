@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202c33">
 <meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WaqarChat">
 <title>WaqarChat</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#111b21;--pn:#202c33;--ch:#0b141a;--me:#005c4b;--yo:#202c33;--tx:#e9edef;--dim:#8696a0;--ac:#00a884;--bl:#53bdeb;--bd:#2a3942;--dg:#f15c6d;--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
@@ -95,7 +97,7 @@ audio{height:36px;max-width:230px}
   <div class="hd"><div id="mav" onclick="profile()" style="cursor:pointer"></div><div class="t" onclick="profile()"><div class="n" id="mn"></div><div class="s" id="mi" onclick="event.stopPropagation();copyId()"></div></div>
   <button class="ib" onclick="newGroup()" title="New group">👥</button><button class="ib" onclick="settings()">⚙️</button></div>
   <div class="sr"><input id="q" placeholder="🔍 Chats search karein" oninput="renderList()"></div>
-  <div class="chips"><button class="chip on" data-f="all" onclick="setF('all')">All</button><button class="chip" data-f="unread" onclick="setF('unread')">Unread</button><button class="chip" data-f="groups" onclick="setF('groups')">Groups</button></div>
+  <div class="chips"><button class="chip on" data-f="all" onclick="setF('all')">All</button><button class="chip" data-f="unread" onclick="setF('unread')">Unread</button><button class="chip" data-f="groups" onclick="setF('groups')">Groups</button><button class="chip" data-f="status" onclick="setF('status')">Status</button></div>
   <div id="list"></div>
   <button class="fab" onclick="newChat()">➕</button>
 </aside>
@@ -178,17 +180,17 @@ function initFB(){if(fbOK)return;if(!firebase.apps.length)firebase.initializeApp
 function getUser(){return new Promise((res,rej)=>{const u=auth.onAuthStateChanged(x=>{u();if(x)res(x);else auth.signInAnonymously().then(c=>res(c.user)).catch(rej)})})}
 async function enter(){
   $('#login').classList.add('hide');$('#app').classList.remove('hide');
-  me.blocked=me.blocked||[];
+  me.blocked=me.blocked||[];stat=((await idbGet('stat_'+me.id))||[]).filter(x=>x.exp>Date.now());
   $('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');$('#mn').textContent=me.name;$('#mi').textContent=me.id+' 📋';
   buildEmoji();renderList();   // chats turant dikh jati hain (offline bhi)
-  const last=LS.get('last',null);if(last&&chats[last]&&innerWidth>860)openChat(last);
+  const last=new URLSearchParams(location.search).get('chat')||LS.get('last',null);if(last&&chats[last]&&(innerWidth>860||location.search.includes('chat=')))openChat(last);
   try{initFB();const u=await getUser();
     db.collection(U).doc(me.id).set({uid:u.uid,name:me.name,color:me.color,dp:me.dp||null,lastSeen:Date.now()},{merge:true}).catch(()=>toast('Yeh ID kisi aur ke paas hai. Logout karke nayi ID lein.'));
   }catch(e){console.error('auth fail',e);toast('Login error: '+((e&&e.code)||e));addEventListener('online',()=>location.reload(),{once:true});return}
   ping();setInterval(()=>{if(!document.hidden)ping()},90000);
-  setTimeout(resendPending,3000);addEventListener('online',()=>{ping();resendPending()});
+  setTimeout(resendPending,3000);setupPush();addEventListener('online',()=>{ping();resendPending()});
   Object.entries(chats).forEach(([id,c])=>{if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
-  listen();
+  listen();listenStatus();
   if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
 }
 function ping(x){if(db&&me)db.collection(U).doc(me.id).set({lastSeen:Date.now(),...(x||{})},{merge:true}).catch(()=>{})}
@@ -252,6 +254,8 @@ function handle(d){
     if(cur===cid&&!document.hidden){markRead(cid)}
     else{c.unread=(c.unread||0)+1;if(!c.mute)notify(c.type==='group'?c.name:c.name,(c.type==='group'?nameOf(d.from)+': ':'')+(d.text||'['+d.kind+']'),cid)}
     break}
+  case'sview':{const x=stat.find(y=>y.id===d.sid);if(x&&!x.views.includes(d.from)){x.views.push(d.from);saveStat()}break}
+  case'sdel':stat=stat.filter(y=>y.id!==d.sid);saveStat();break;
   case'ack':(d.ids||[]).forEach(i=>{const m=f(i);if(m&&m.status!=='read')m.status='delivered'});break;
   case'read':(d.ids||[]).forEach(i=>{const m=f(i);if(m)m.status='read'});break;
   case'edit':{const m=f(d.id);if(m){m.text=d.text;m.edited=1}break}
@@ -276,6 +280,8 @@ function prev(m){if(!m)return'Chat shuru karein';if(m.deleted)return'🚫 Messag
 const tk=s=>s==='pending'?'🕓':s==='read'?'<b style="color:var(--bl)">✓✓</b>':s==='delivered'?'✓✓':'✓';
 function renderList(){
   if(!me)return;
+  const sc=$('[data-f=status]');if(sc)sc.textContent='Status'+(stat.some(x=>x.owner!==me.id&&!x.seen)?' 🟢':'');
+  if(filter==='status')return renderStatusList();
   const q=$('#q').value.toLowerCase();
   const a=Object.entries(chats).filter(([id,c])=>(c.name||id).toLowerCase().includes(q)&&(filter==='all'||(filter==='unread'&&c.unread)||(filter==='groups'&&c.type==='group')));
   a.sort((x,y)=>(y[1].pin?1:0)-(x[1].pin?1:0)||lt(y[1])-lt(x[1]));
@@ -473,7 +479,7 @@ function saveP(){const n=($('#pn')&&$('#pn').value.trim())||me.name;me.name=n;LS
 function settings(){
   modal(`<h2>⚙️ Settings</h2><div class="row" onclick="setTheme()"><span>🌓 Theme badlein (Dark / Light)</span></div>
   <div style="margin:8px 0">🖼️ Chat background<br>${['','#0d1b2a','#1b2a1b','#2a1b2a','#2a2418','#e8d9c5'].map(c=>`<span class="sw" style="background:${c||'var(--ch)'}" onclick="me.wp='${c}';LS.set('me',me);if(cur)openChat(cur);closeM()"></span>`).join('')}</div>
-  <div class="row" onclick="Notification.requestPermission().then(()=>toast('Notifications check ho gayi'))"><span>🔔 Notifications on karein</span></div>
+  <div class="row" onclick="closeM();enablePush()"><span>🔔 Notifications on karein</span></div>
   <div class="row" onclick="closeM();showBlocked()"><span>🚫 Blocked users (${me.blocked.length})</span></div>
   <div class="mt" style="text-align:center;margin:10px 0">Created by Waqar Ahmed</div>
   <button class="btn g" onclick="logout()">🚪 Logout</button><button class="btn r" onclick="resetAll()">🗑️ Reset All</button><button class="btn g" onclick="closeM()">Close</button>`);
@@ -483,7 +489,89 @@ function setTheme(){const l=document.body.classList.toggle('light');LS.set('them
 function logout(){if(confirm('Logout? Chats is device par safe rahengi.')){saveNow();setTimeout(()=>location.reload(),150);localStorage.removeItem('wc_me')}}
 function resetAll(){if(confirm('Sab kuch delete? ID aur chats gayab ho jayengi.')){localStorage.clear();indexedDB.deleteDatabase('wc');setTimeout(()=>location.reload(),300)}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeCtx()}});
+let stat=[],stbg='#00a884';
+const BGS=['#00a884','#8b5cf6','#f472b6','#fb923c','#2563eb','#334155'];
+function saveStat(){if(me)idbSet('stat_'+me.id,stat)}
+setInterval(()=>{const n=stat.length;stat=stat.filter(x=>x.exp>Date.now());if(stat.length!==n){saveStat();if(filter==='status')renderList()}},60000);
+function listenStatus(){
+  db.collection('pakchat_status').where('to','==',me.id).onSnapshot(s=>{
+    let n=0;
+    s.docChanges().forEach(ch=>{
+      if(ch.type!=='added')return;const d=ch.doc.data();
+      if(d.exp>Date.now()&&!me.blocked.includes(d.owner)&&!stat.some(x=>x.id===d.sid)){stat.push({id:d.sid,owner:d.owner,name:d.ownerName,kind:d.kind,text:d.text,bg:d.bg,data:d.data,ts:d.ts,exp:d.exp,seen:false});n++}
+      ch.doc.ref.delete().catch(()=>{});   // mobile mein save ho gaya, server se delete
+    });
+    if(n){saveStat();renderList();toast('🟢 Naya status aaya')}
+  },e=>console.error(e));
+}
+async function postStatus(o){
+  const to=Object.entries(chats).filter(([i,c])=>c.type==='dm'&&!me.blocked.includes(i)).map(([i])=>i);
+  if(!to.length)return toast('Pehle kisi dost se chat shuru karein');
+  const ts=Date.now(),sid=me.id+'_'+ts,x={kind:o.kind,text:o.text||'',bg:o.bg||'',data:o.data||null};
+  stat.push({id:sid,owner:me.id,name:me.name,ts,exp:ts+864e5,views:[],seen:true,...x});saveStat();
+  to.forEach(r=>db.collection('pakchat_status').add({sid,owner:me.id,ownerName:me.name,to:r,ts,exp:ts+864e5,...x}).catch(e=>console.error('status',e)));
+  toast('Status lag gaya ✅');renderList();
+}
+function photoStatus(){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0])postStatus({kind:'image',data:await imgC(f.files[0],900,.7)})};f.click()}
+function textStatus(){stbg=BGS[0];modal(`<h2>✏️ Text status</h2><textarea id="stt" class="fld" rows="4" maxlength="200" placeholder="Kya chal raha hai?"></textarea><div>${BGS.map(c=>`<span class="sw" style="background:${c}" onclick="stbg='${c}'"></span>`).join('')}</div><button class="btn" onclick="postText()">Post</button><button class="btn g" onclick="closeM()">Cancel</button>`)}
+function postText(){const t=$('#stt').value.trim();if(!t)return;closeM();postStatus({kind:'text',text:t,bg:stbg})}
+function renderStatusList(){
+  const mine=stat.filter(x=>x.owner===me.id),by={};
+  stat.filter(x=>x.owner!==me.id).forEach(x=>(by[x.owner]=by[x.owner]||[]).push(x));
+  const rows=Object.entries(by).map(([o,a])=>({o,n:a.length,last:Math.max(...a.map(x=>x.ts)),un:a.some(x=>!x.seen)})).sort((x,y)=>y.un-x.un||y.last-x.last);
+  const ring=u=>`border-radius:50%;box-shadow:0 0 0 2px var(--bg),0 0 0 4px ${u?'var(--ac)':'var(--bd)'}`;
+  $('#list').innerHTML=`<div class="ci" onclick="${mine.length?`viewStatus('${me.id}')`:'photoStatus()'}"><div style="${ring(mine.length)}">${av(me.dp,me.name,me.color)}</div>
+  <div class="cm"><div class="cn">Mera status</div><div class="cl">${mine.length?mine.length+' active • dekhne ke liye dabayein':'Status lagane ke liye 📷 ya ✏️ dabayein'}</div></div>
+  <span style="display:flex"><button class="ib" onclick="event.stopPropagation();photoStatus()">📷</button><button class="ib" onclick="event.stopPropagation();textStatus()">✏️</button></span></div>
+  <div style="padding:10px 16px;color:var(--dim);font-size:13px">${rows.length?'Doston ke status':'Abhi kisi dost ka status nahi hai'}</div>`+
+  rows.map(r=>`<div class="ci" onclick="viewStatus('${r.o}')"><div style="${ring(r.un)}">${av(pres[r.o]&&pres[r.o].dp,nameOf(r.o),pc(r.o))}</div><div class="cm"><div class="r1"><span class="cn">${esc(nameOf(r.o))}</span><span class="ct">${tm(r.last)}</span></div><div class="cl">${r.n} status${r.un?' • naya':''}</div></div></div>`).join('');
+}
+function viewStatus(owner){
+  const list=stat.filter(x=>x.owner===owner).sort((a,b)=>a.ts-b.ts);if(!list.length)return;
+  let i=list.findIndex(x=>!x.seen);if(i<0)i=0;let t;
+  const el=document.createElement('div');el.id='sv';el.style.cssText='position:fixed;inset:0;z-index:500;background:#000;display:flex;flex-direction:column;color:#fff';
+  document.body.appendChild(el);
+  const close=()=>{clearTimeout(t);el.remove();renderList()};
+  const show=()=>{
+    clearTimeout(t);const x=list[i];if(!x)return close();
+    if(owner!==me.id&&!x.seen){x.seen=true;saveStat();put(owner,{t:'sview',sid:x.id}).catch(()=>{})}
+    const bars=list.map((_,k)=>`<div style="flex:1;height:3px;border-radius:2px;background:${k<=i?'#fff':'rgba(255,255,255,.3)'}"></div>`).join('');
+    el.innerHTML=`<div style="display:flex;gap:4px;padding:calc(10px + var(--st)) 10px 6px">${bars}</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 14px"><b style="flex:1">${esc(owner===me.id?'Aap ka status':x.name)} <span style="opacity:.7;font-weight:400;font-size:13px">${tm(x.ts)}</span></b>${owner===me.id?`<button onclick="showViews('${x.id}')">👁 ${x.views.length}</button><button onclick="delStatus('${x.id}')">🗑️</button>`:''}<button style="font-size:22px" onclick="document.getElementById('sv').remove();renderList()">✕</button></div>
+    <div id="svb" style="flex:1;display:grid;place-items:center;overflow:hidden;${x.kind==='text'?'background:'+x.bg+';padding:24px;':''}">${x.kind==='image'?`<img src="${x.data}" style="max-width:100%;max-height:100%">`:`<div style="font-size:26px;text-align:center;white-space:pre-wrap;word-break:break-word">${esc(x.text)}</div>`}</div>`;
+    el.querySelector('#svb').onclick=e=>{i+=e.clientX<innerWidth/3?-1:1;if(i<0)i=0;if(i>=list.length)return close();show()};
+    t=setTimeout(()=>{i++;i>=list.length?close():show()},5000);
+  };
+  show();
+}
+function showViews(id){const x=stat.find(y=>y.id===id);alert(x&&x.views.length?'Dekha:\n'+x.views.map(nameOf).join('\n'):'Abhi kisi ne nahi dekha')}
+function delStatus(id){
+  if(!confirm('Yeh status delete karein?'))return;
+  stat=stat.filter(x=>x.id!==id);saveStat();
+  Object.entries(chats).forEach(([i,c])=>{if(c.type==='dm')put(i,{t:'sdel',sid:id}).catch(()=>{})});
+  const v=document.getElementById('sv');if(v)v.remove();renderList();toast('Status delete ho gaya');
+}
 let divIdx=-1;
+const VAPID='PASTE_VAPID_KEY_HERE';
+async function setupPush(){
+  try{
+    if(!('serviceWorker' in navigator)||!firebase.messaging.isSupported()||!('Notification' in window)||Notification.permission!=='granted'||VAPID.startsWith('PASTE'))return;
+    const reg=await navigator.serviceWorker.register('firebase-messaging-sw.js');
+    const tok=await firebase.messaging().getToken({vapidKey:VAPID,serviceWorkerRegistration:reg});
+    if(tok&&tok!==LS.get('fcm_'+me.id,null)){
+      await db.collection('pakchat_tokens').doc(me.id).set({tokens:firebase.firestore.FieldValue.arrayUnion(tok),at:Date.now()},{merge:true});
+      LS.set('fcm_'+me.id,tok);
+    }
+  }catch(e){console.error('push',e)}
+}
+async function enablePush(){
+  if(!('Notification' in window))return toast('Is browser mein notifications nahi hain');
+  if(VAPID.startsWith('PASTE'))return toast('VAPID key set nahi hai');
+  const p=await Notification.requestPermission();
+  if(p!=='granted')return toast('Notification ki permission nahi mili');
+  await setupPush();toast('Push notifications on ho gayi ✅');
+}
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.open&&chats[e.data.open])openChat(e.data.open)});
 async function userCheck(id){try{const s=await db.collection(U).doc(id).get();return s.exists}catch(e){console.error(e);return 'err'}}
 function rmMem(id){const c=chats[cur];if(!confirm(nameOf(id)+' ko group se nikalein?'))return;c.members=c.members.filter(x=>x!==id);c.msgs.push({id:'s'+Date.now(),kind:'sys',text:nameOf(id)+' ko nikala gaya',ts:Date.now()});put(id,{t:'ginfo',gname:c.name,members:c.members,admin:c.admin||null},cur).catch(()=>{});wire(cur,{t:'ginfo',gdp:c.dp||null});save();render();hdr();closeM();info()}
 function starred(){const c=chats[cur],a=c.msgs.filter(m=>m.star&&!m.deleted);modal(`<h2>⭐ Starred</h2>${a.map(m=>`<div class="row" onclick="closeM();jump('${m.id}')"><span><b>${esc(nameOf(m.from))}</b><br>${esc(prev(m))}</span><span class="ct">${tm(m.ts)}</span></div>`).join('')||'Koi starred message nahi'}<button class="btn g" onclick="closeM()">Close</button>`)}
@@ -491,4 +579,4 @@ function exportChat(){const c=chats[cur];const t=c.msgs.filter(m=>m.kind!=='sys'
 boot();
 </script>
 </body>
-</html> 
+</html>
