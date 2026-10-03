@@ -184,8 +184,9 @@ async function enter(){
   const last=LS.get('last',null);if(last&&chats[last]&&innerWidth>860)openChat(last);
   try{initFB();const u=await getUser();
     db.collection(U).doc(me.id).set({uid:u.uid,name:me.name,color:me.color,dp:me.dp||null,lastSeen:Date.now()},{merge:true}).catch(()=>toast('Yeh ID kisi aur ke paas hai. Logout karke nayi ID lein.'));
-  }catch(e){addEventListener('online',()=>location.reload(),{once:true});return}
-  ping();setInterval(()=>{if(!document.hidden)ping()},25000);
+  }catch(e){console.error('auth fail',e);toast('Login error: '+((e&&e.code)||e));addEventListener('online',()=>location.reload(),{once:true});return}
+  ping();setInterval(()=>{if(!document.hidden)ping()},90000);
+  setTimeout(resendPending,3000);addEventListener('online',()=>{ping();resendPending()});
   Object.entries(chats).forEach(([id,c])=>{if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
   listen();
   if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
@@ -203,15 +204,15 @@ function watch(id){
     if(p.typing===me.id&&Date.now()-p.typingAt<4000)setTimeout(hdr,4200);
   },()=>{});
 }
-function seen(id){const p=pres[id];if(!p)return'';if(p.typing===me.id&&Date.now()-p.typingAt<4000)return'typing…';if(Date.now()-p.lastSeen<60000)return'online';const d=dl(p.lastSeen);return'last seen '+(d==='Today'?'today':d==='Yesterday'?'yesterday':d)+' at '+tm(p.lastSeen)}
-const isOn=id=>pres[id]&&Date.now()-pres[id].lastSeen<60000;
+function seen(id){const p=pres[id];if(!p)return'';if(p.typing===me.id&&Date.now()-p.typingAt<4000)return'typing…';if(Date.now()-p.lastSeen<150000)return'online';const d=dl(p.lastSeen);return'last seen '+(d==='Today'?'today':d==='Yesterday'?'yesterday':d)+' at '+tm(p.lastSeen)}
+const isOn=id=>pres[id]&&Date.now()-pres[id].lastSeen<150000;
 const nameOf=id=>id===me.id?'Aap':(pres[id]&&pres[id].name)||(chats[id]&&chats[id].name)||id;
 
 /* ---------- send / receive ---------- */
 function put(to,o,gid){return db.collection(C).add({to,from:me.id,fromName:me.name,gid:gid||null,createdAt:Date.now(),...o})}
 function wire(cid,o){
   const c=chats[cid],g=c.type==='group',rs=g?c.members.filter(x=>x!==me.id):[cid];
-  const base=g?{gname:c.name,members:c.members}:{};
+  const base=g?{gname:c.name,members:c.members,admin:c.admin||null}:{};
   return Promise.all(rs.map(r=>put(r,{...base,...o},g?cid:null)));
 }
 function post(cid,p){
@@ -219,9 +220,14 @@ function post(cid,p){
   const m={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),from:me.id,ts:Date.now(),status:'pending',...p};
   if(replyTo&&cur===cid){m.reply=replyTo;cancelRB()}
   c.msgs.push(m);c.draft='';save();render(1);renderList();
-  wire(cid,{t:'m',id:m.id,ts:m.ts,kind:m.kind,text:m.text||'',data:m.data||null,name:m.name||null,size:m.size||null,dur:m.dur||null,reply:m.reply||null,fwd:m.fwd||0})
-   .then(()=>{if(m.status==='pending'){m.status='sent';save();render();renderList()}}).catch(()=>{});
+  push(cid,m);
 }
+function push(cid,m){
+  return wire(cid,{t:'m',id:m.id,ts:m.ts,kind:m.kind,text:m.text||'',data:m.data||null,name:m.name||null,size:m.size||null,dur:m.dur||null,reply:m.reply||null,fwd:m.fwd||0})
+   .then(()=>{if(m.status==='pending'){m.status='sent';save();render();renderList()}})
+   .catch(e=>{console.error('send fail',e);toast(e&&e.code==='permission-denied'?'Server ne message rok diya (permission denied)':'Send fail: '+((e&&e.code)||e))});
+}
+function resendPending(){Object.entries(chats).forEach(([cid,c])=>c.msgs.forEach(m=>{if(m.from===me.id&&m.status==='pending')push(cid,m)}))}
 function listen(){
   db.collection(C).where('to','==',me.id).onSnapshot(s=>{
     s.docChanges().forEach(ch=>{if(ch.type!=='added')return;const d=ch.doc.data();try{handle(d)}catch(e){console.error(e)}ch.doc.ref.delete().catch(()=>{})});
@@ -231,11 +237,12 @@ function listen(){
 function handle(d){
   if(!d.t||me.blocked.includes(d.from))return;
   const cid=d.gid||d.from;let isNew=false;
-  if(!chats[cid]){isNew=true;chats[cid]=d.gid?{type:'group',name:d.gname||'Group',members:d.members||[],msgs:[],unread:0,color:pc(cid)}:{type:'dm',name:d.fromName||cid,msgs:[],unread:0,color:pc(cid)};
+  if(!chats[cid]){isNew=true;chats[cid]=d.gid?{type:'group',name:d.gname||'Group',members:d.members||[],admin:d.admin||null,msgs:[],unread:0,color:pc(cid)}:{type:'dm',name:d.fromName||cid,msgs:[],unread:0,color:pc(cid)};
     if(d.gid)(d.members||[]).forEach(watch);else watch(cid)}
   const c=chats[cid],f=id=>c.msgs.find(m=>m.id===id);
   switch(d.t){
-  case'ginfo':c.name=d.gname||c.name;c.members=d.members||c.members;if(d.gdp)c.dp=d.gdp;c.members.forEach(watch);
+  case'ginfo':if(d.members&&!d.members.includes(me.id)){c.members=d.members;c.left=1;c.msgs.push({id:'s'+Date.now(),kind:'sys',text:'Aap ko group se nikal diya gaya',ts:Date.now()});break}
+    if(d.admin)c.admin=d.admin;c.name=d.gname||c.name;c.members=d.members||c.members;if(d.gdp)c.dp=d.gdp;c.members.forEach(watch);
     if(isNew)c.msgs.push({id:'s'+Date.now(),kind:'sys',text:nameOf(d.from)+' ne aap ko group mein add kiya',ts:Date.now()});break;
   case'm':{
     if(f(d.id))break;
@@ -286,7 +293,7 @@ function renderList(){
 function openChat(id){
   if(!chats[id])return;
   if(cur&&chats[cur])chats[cur].draft=$('#inp').value;
-  cur=id;const c=chats[id];c.unread=0;replyTo=editing=null;searchQ='';$('#mq').value='';$('#msr').classList.add('hide');
+  cur=id;const c=chats[id];divIdx=c.unread?c.msgs.length-c.unread:-1;c.unread=0;replyTo=editing=null;searchQ='';$('#mq').value='';$('#msr').classList.add('hide');
   $('#welcome').classList.add('hide');$('#chat').classList.remove('hide');$('#app').classList.add('open');
   ['rbar','emo','att','rec'].forEach(x=>$('#'+x).classList.add('hide'));
   $('#inp').value=c.draft||'';fit();hdr();render(1);renderList();markRead(id);LS.set('last',id);
@@ -303,8 +310,9 @@ function render(force){
   const c=chats[cur];if(!c)return;const box=$('#msgs');
   const near=force||box.scrollHeight-box.scrollTop-box.clientHeight<140;
   const q=searchQ.toLowerCase();let h='',ld='';
-  c.msgs.forEach(m=>{
+  c.msgs.forEach((m,ix)=>{
     if(q&&!(m.text||'').toLowerCase().includes(q))return;
+    if(ix===divIdx&&!q)h+=`<div class="sys" style="color:var(--ac)">${c.msgs.length-divIdx} unread messages</div>`;
     const dy=dl(m.ts);if(dy!==ld){h+=`<div class="day">${dy}</div>`;ld=dy}
     if(m.kind==='sys'){h+=`<div class="sys">${esc(m.text)}</div>`;return}
     const mine=m.from===me.id;let b='';
@@ -367,6 +375,7 @@ function send(){
   const t=$('#inp').value.trim();
   if(!t&&!editing){return toggleRec()}
   if(!cur||!t)return;
+  if(chats[cur].left)return toast('Aap ab is group mein nahi hain');
   if(editing){const m=find(editing);m.text=t;m.edited=1;wire(cur,{t:'edit',id:editing,text:t});editing=null;$('#rbar').classList.add('hide');save();render();renderList()}
   else post(cur,{kind:'text',text:t});
   $('#inp').value='';fit();sicon();
@@ -408,9 +417,9 @@ function newChat(){modal(`<h2>Nayi chat</h2><input class="fld" id="nid" placehol
 async function startChat(){
   const id=slug($('#nid').value);if(!id)return;if(id===me.id)return toast('Khud se chat nahi ho sakti');
   if(chats[id]){closeM();return openChat(id)}
-  const s=await db.collection(U).doc(id).get().catch(()=>null);
-  if(!s||!s.exists)return toast('Yeh ID nahi mili');
-  const p=s.data();chats[id]={type:'dm',name:p.name,dp:p.dp||null,color:p.color||pc(id),msgs:[],unread:0};pres[id]=p;watch(id);save();closeM();openChat(id);
+  const r=await userCheck(id);if(r==='err')return toast('Server error, internet check karein');
+  if(!r&&!confirm('Yeh ID abhi mili nahi (shayad unhon ne app update nahi ki). Phir bhi chat banayein?'))return;
+  chats[id]={type:'dm',name:id,color:pc(id),msgs:[],unread:0};watch(id);save();closeM();openChat(id);
 }
 function newGroup(){
   const dms=Object.entries(chats).filter(([i,c])=>c.type==='dm');
@@ -423,7 +432,7 @@ async function mkGroup(){
   const name=$('#gn').value.trim();if(!name)return toast('Group ka naam likhein');
   const ids=[...$$('.gm:checked').map(x=>x.value),...$('#gx').value.split(',').map(slug).filter(Boolean)].filter(x=>x!==me.id);
   const uniq=[...new Set(ids)];if(!uniq.length)return toast('Kam az kam 1 member chunein');
-  for(const i of uniq){const s=await db.collection(U).doc(i).get().catch(()=>null);if(!s||!s.exists)return toast(i+' ki ID nahi mili')}
+  for(const i of uniq){const r=await userCheck(i);if(r==='err')return toast('Server error, internet check karein');if(!r&&!confirm('ID "'+i+'" abhi mili nahi (shayad unhon ne app update nahi ki). Phir bhi add karein?'))return}
   const gid='g_'+Math.random().toString(36).slice(2,9);
   chats[gid]={type:'group',name,members:[me.id,...uniq],admin:me.id,msgs:[{id:'s'+Date.now(),kind:'sys',text:'Aap ne "'+name+'" group banaya',ts:Date.now()}],unread:0,color:pc(gid)};
   uniq.forEach(watch);wire(gid,{t:'ginfo'});save();closeM();openChat(gid);
@@ -433,7 +442,7 @@ function info(){
   if(c.type==='dm')return modal(`${av(c.dp,c.name,c.color||pc(cur),'lg')}<h2 style="text-align:center">${esc(c.name)}</h2><p style="text-align:center;color:var(--dim)">ID: ${esc(cur)}<br>${esc(seen(cur))}</p>
   <button class="btn g" onclick="rename()">✏️ Naam badlein</button><button class="btn g" onclick="blockToggle()">${me.blocked.includes(cur)?'✅ Unblock':'🚫 Block'}</button><button class="btn g" onclick="closeM()">Close</button>`);
   modal(`<div onclick="gdp()" style="cursor:pointer">${av(c.dp,c.name,c.color,'lg')}</div><h2 style="text-align:center">${esc(c.name)}</h2><p style="text-align:center;color:var(--dim);margin-bottom:8px">${c.members.length} members • DP badalne ke liye photo dabayein</p>
-  ${c.members.map(i=>`<div class="row">${av(pres[i]&&pres[i].dp,nameOf(i),pc(i),'sm')}<span>${esc(i===me.id?'Aap':nameOf(i))}${i===c.admin?' 👑':''}</span></div>`).join('')}
+  ${c.members.map(i=>`<div class="row">${av(pres[i]&&pres[i].dp,nameOf(i),pc(i),'sm')}<span>${esc(i===me.id?'Aap':nameOf(i))}${i===c.admin?' 👑':''}</span>${c.admin===me.id&&i!==me.id?`<button onclick="rmMem('${i}')">❌</button>`:''}</div>`).join('')}
   <input class="fld" id="am" placeholder="Member ki ID add karein" style="margin-top:8px"><button class="btn g" onclick="addMem()">➕ Add member</button><button class="btn g" onclick="renameG()">✏️ Group ka naam</button><button class="btn r" onclick="leaveG()">🚪 Group chhodein</button><button class="btn g" onclick="closeM()">Close</button>`);
 }
 function rename(){const n=prompt('Naya naam',chats[cur].name);if(n&&n.trim()){chats[cur].alias=chats[cur].name=n.trim();save();hdr();renderList();closeM()}}
@@ -441,7 +450,7 @@ function renameG(){const n=prompt('Group ka naam',chats[cur].name);if(n&&n.trim(
 function blockToggle(){const i=me.blocked.indexOf(cur);if(i>=0)me.blocked.splice(i,1);else me.blocked.push(cur);LS.set('me',me);closeM();toast(i>=0?'Unblock ho gaya':'Block ho gaya')}
 async function addMem(){
   const id=slug($('#am').value),c=chats[cur];if(!id||c.members.includes(id))return;
-  const s=await db.collection(U).doc(id).get().catch(()=>null);if(!s||!s.exists)return toast('Yeh ID nahi mili');
+  const r=await userCheck(id);if(r==='err')return toast('Server error, internet check karein');if(!r&&!confirm('Yeh ID abhi mili nahi. Phir bhi add karein?'))return;
   c.members.push(id);watch(id);c.msgs.push({id:'s'+Date.now(),kind:'sys',text:nameOf(id)+' ko add kiya gaya',ts:Date.now()});wire(cur,{t:'ginfo',gdp:c.dp||null});save();render();hdr();closeM();
 }
 function leaveG(){if(!confirm('Group chhodein?'))return;const c=chats[cur];c.members=c.members.filter(x=>x!==me.id);wire(cur,{t:'ginfo'});delete chats[cur];save();closeM();closeChat()}
@@ -449,7 +458,7 @@ function gdp(){const f=document.createElement('input');f.type='file';f.accept='i
 function chatMenu(){
   const c=chats[cur];
   modal(`<h2>${esc(c.name)}</h2><button class="btn g" onclick="closeM();info()">ℹ️ Info</button><button class="btn g" onclick="c1('pin')">${c.pin?'📌 Unpin':'📌 Pin chat'}</button><button class="btn g" onclick="c1('mute')">${c.mute?'🔔 Unmute':'🔇 Mute'}</button>
-  <button class="btn g" onclick="closeM();clearChat()">🧹 Chat clear karein</button><button class="btn r" onclick="closeM();delChat()">🗑️ Chat delete karein</button><button class="btn g" onclick="closeM()">Cancel</button>`);
+  <button class="btn g" onclick="closeM();starred()">⭐ Starred messages</button><button class="btn g" onclick="closeM();exportChat()">📤 Chat export (txt)</button><button class="btn g" onclick="closeM();clearChat()">🧹 Chat clear karein</button><button class="btn r" onclick="closeM();delChat()">🗑️ Chat delete karein</button><button class="btn g" onclick="closeM()">Cancel</button>`);
 }
 function c1(k){chats[cur][k]=!chats[cur][k];save();renderList();closeM()}
 function clearChat(){if(confirm('Saare messages hata dein?')){chats[cur].msgs=[];save();render();renderList()}}
@@ -474,7 +483,12 @@ function setTheme(){const l=document.body.classList.toggle('light');LS.set('them
 function logout(){if(confirm('Logout? Chats is device par safe rahengi.')){saveNow();setTimeout(()=>location.reload(),150);localStorage.removeItem('wc_me')}}
 function resetAll(){if(confirm('Sab kuch delete? ID aur chats gayab ho jayengi.')){localStorage.clear();indexedDB.deleteDatabase('wc');setTimeout(()=>location.reload(),300)}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeCtx()}});
+let divIdx=-1;
+async function userCheck(id){try{const s=await db.collection(U).doc(id).get();return s.exists}catch(e){console.error(e);return 'err'}}
+function rmMem(id){const c=chats[cur];if(!confirm(nameOf(id)+' ko group se nikalein?'))return;c.members=c.members.filter(x=>x!==id);c.msgs.push({id:'s'+Date.now(),kind:'sys',text:nameOf(id)+' ko nikala gaya',ts:Date.now()});put(id,{t:'ginfo',gname:c.name,members:c.members,admin:c.admin||null},cur).catch(()=>{});wire(cur,{t:'ginfo',gdp:c.dp||null});save();render();hdr();closeM();info()}
+function starred(){const c=chats[cur],a=c.msgs.filter(m=>m.star&&!m.deleted);modal(`<h2>⭐ Starred</h2>${a.map(m=>`<div class="row" onclick="closeM();jump('${m.id}')"><span><b>${esc(nameOf(m.from))}</b><br>${esc(prev(m))}</span><span class="ct">${tm(m.ts)}</span></div>`).join('')||'Koi starred message nahi'}<button class="btn g" onclick="closeM()">Close</button>`)}
+function exportChat(){const c=chats[cur];const t=c.msgs.filter(m=>m.kind!=='sys'&&!m.deleted).map(m=>'['+new Date(m.ts).toLocaleString()+'] '+nameOf(m.from)+': '+prev(m)).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download=(c.name||'chat')+'.txt';a.click()}
 boot();
 </script>
 </body>
-</html>
+</html> 
