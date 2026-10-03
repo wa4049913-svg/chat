@@ -40,6 +40,7 @@ input,textarea{font:inherit;color:inherit;background:none;border:0;outline:0;wid
 .od{position:absolute;right:0;bottom:0;width:12px;height:12px;border-radius:50%;background:var(--ac);border:2px solid var(--bg)}
 .sr{padding:8px 12px;background:var(--bg)}.sr input{background:var(--pn);border-radius:10px;padding:9px 14px}
 .chips{display:flex;gap:8px;padding:2px 12px 8px}.chip{padding:5px 14px;border-radius:16px;background:var(--pn);color:var(--dim);font-size:13.5px}.chip.on{background:rgba(0,168,132,.2);color:var(--ac)}
+#notice{display:flex;gap:10px;align-items:flex-start;background:rgba(234,179,8,.15);border-bottom:1px solid rgba(234,179,8,.45);padding:10px 14px;font-size:13px;line-height:1.45;flex-shrink:0}#notice span{flex:1}#notice button{font-size:18px;color:var(--dim);line-height:1}
 #list{flex:1;overflow-y:auto}
 .ci{display:flex;gap:13px;padding:10px 14px;cursor:pointer;align-items:center}.ci:hover,.ci.act{background:var(--pn)}
 .cm{flex:1;min-width:0;border-bottom:1px solid var(--bd);padding-bottom:10px}.r1,.r2{display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -89,6 +90,7 @@ audio{height:36px;max-width:230px}
 <input id="ln" placeholder="Aap ka naam" maxlength="24">
 <input id="li" placeholder="unique-id (a-z, 0-9, -)" maxlength="20" autocapitalize="off" spellcheck="false">
 <button class="btn" id="lb" onclick="login()">Start Chatting</button>
+<button class="btn g" style="margin-top:10px" onclick="googleRecover()">🔁 Google se purani ID wapas layein</button>
 <div id="le" style="color:var(--dg);margin-top:10px;font-size:13px"></div>
 </div></div>
 
@@ -96,6 +98,7 @@ audio{height:36px;max-width:230px}
 <aside id="side">
   <div class="hd"><div id="mav" onclick="profile()" style="cursor:pointer"></div><div class="t" onclick="profile()"><div class="n" id="mn"></div><div class="s" id="mi" onclick="event.stopPropagation();copyId()"></div></div>
   <button class="ib" onclick="newGroup()" title="New group">👥</button><button class="ib" onclick="settings()">⚙️</button></div>
+  <div id="notice" class="hide"><span id="ntx"></span><button onclick="closeNotice()" title="Band karein">✕</button></div>
   <div class="sr"><input id="q" placeholder="🔍 Chats search karein" oninput="renderList()"></div>
   <div class="chips"><button class="chip on" data-f="all" onclick="setF('all')">All</button><button class="chip" data-f="unread" onclick="setF('unread')">Unread</button><button class="chip" data-f="groups" onclick="setF('groups')">Groups</button><button class="chip" data-f="status" onclick="setF('status')">Status</button></div>
   <div id="list"></div>
@@ -182,7 +185,7 @@ async function enter(){
   $('#login').classList.add('hide');$('#app').classList.remove('hide');
   me.blocked=me.blocked||[];stat=((await idbGet('stat_'+me.id))||[]).filter(x=>x.exp>Date.now());
   $('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');$('#mn').textContent=me.name;$('#mi').textContent=me.id+' 📋';
-  buildEmoji();renderList();   // chats turant dikh jati hain (offline bhi)
+  buildEmoji();renderList();showNotice();   // chats turant dikh jati hain (offline bhi)
   const last=new URLSearchParams(location.search).get('chat')||LS.get('last',null);if(last&&chats[last]&&(innerWidth>860||location.search.includes('chat=')))openChat(last);
   try{initFB();const u=await getUser();
     db.collection(U).doc(me.id).set({uid:u.uid,name:me.name,color:me.color,dp:me.dp||null,lastSeen:Date.now()},{merge:true}).catch(()=>toast('Yeh ID kisi aur ke paas hai. Logout karke nayi ID lein.'));
@@ -327,7 +330,7 @@ function render(force){
     else{
       if(m.fwd)b+='<div class="fw">↪ Forwarded</div>';
       if(m.reply)b+=`<div class="rq" onclick="jump('${m.reply.id}')"><b>${esc(m.reply.who)}</b><span>${esc(m.reply.text)}</span></div>`;
-      if(m.kind==='image')b+=`<img class="mi" src="${m.data}" onclick="viewImg(this.src)">`;
+      if(m.nomedia)b+='<i class="dd">📎 Media backup mein shamil nahi tha</i>';else if(m.kind==='image')b+=`<img class="mi" src="${m.data}" onclick="viewImg(this.src)">`;
       else if(m.kind==='file')b+=`<div class="fl"><span style="font-size:28px">📄</span><div><a download="${esc(m.name)}" href="${m.data}">${esc(m.name)}</a><div class="mt" style="text-align:left">${fs(m.size||0)}</div></div></div>`;
       else if(m.kind==='voice')b+=`<audio controls preload="none" src="${m.data}"></audio>`;
       else b+=`<div class="t">${lnk(m.text)}</div>`;
@@ -481,6 +484,7 @@ function settings(){
   <div style="margin:8px 0">🖼️ Chat background<br>${['','#0d1b2a','#1b2a1b','#2a1b2a','#2a2418','#e8d9c5'].map(c=>`<span class="sw" style="background:${c||'var(--ch)'}" onclick="me.wp='${c}';LS.set('me',me);if(cur)openChat(cur);closeM()"></span>`).join('')}</div>
   <div class="row" onclick="closeM();enablePush()"><span>🔔 Notifications on karein</span></div>
   <div class="row" onclick="closeM();showBlocked()"><span>🚫 Blocked users (${me.blocked.length})</span></div>
+  <div class="row" onclick="closeM();backupMenu()"><span>💾 Backup / Restore</span></div>${gRow()}
   <div class="mt" style="text-align:center;margin:10px 0">Created by Waqar Ahmed</div>
   <button class="btn g" onclick="logout()">🚪 Logout</button><button class="btn r" onclick="resetAll()">🗑️ Reset All</button><button class="btn g" onclick="closeM()">Close</button>`);
 }
@@ -551,6 +555,81 @@ function delStatus(id){
   Object.entries(chats).forEach(([i,c])=>{if(c.type==='dm')put(i,{t:'sdel',sid:id}).catch(()=>{})});
   const v=document.getElementById('sv');if(v)v.remove();renderList();toast('Status delete ho gaya');
 }
+// ================= Google link + encrypted backup =================
+function gRow(){const g=auth&&auth.currentUser&&auth.currentUser.providerData.find(x=>x.providerId==='google.com');
+  return g?`<div class="row"><span>✅ Google juda hai: ${esc(g.email||'')}</span></div>`:`<div class="row" onclick="closeM();linkGoogle()"><span>🔗 Google se ID jodein (zaroori)</span></div>`}
+async function linkGoogle(){
+  try{
+    const r=await auth.currentUser.linkWithPopup(new firebase.auth.GoogleAuthProvider());
+    await db.collection('pakchat_uids').doc(r.user.uid).set({id:me.id,at:Date.now()});
+    toast('Google se ID juD gayi ✅');
+  }catch(e){toast(e.code==='auth/credential-already-in-use'?'Yeh Google account pehle se kisi aur ID se juda hai. Login screen par "Google se purani ID wapas layein" use karein.':e.code==='auth/popup-blocked'?'Popup block hai, allow karein':e.code==='auth/popup-closed-by-user'?'Cancel kiya':'Google link fail: '+(e.code||e))}
+}
+async function googleRecover(){
+  try{
+    initFB();$('#le').textContent='';
+    const r=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    const m=await db.collection('pakchat_uids').doc(r.user.uid).get();
+    if(!m.exists){await auth.signOut();return $('#le').textContent='Is Google account se koi ID juri nahi mili.'}
+    const id=m.data().id,u=await db.collection(U).doc(id).get(),pr=u.exists?u.data():{};
+    me={id,name:pr.name||id,color:pr.color||pc(id),dp:pr.dp||null};LS.set('me',me);
+    chats=(await idbGet('chats_'+id))||{};await enter();
+    setTimeout(()=>{if(confirm('ID wapas aa gayi! Kya chats ka backup restore karna chahte hain?'))restoreBackup()},1200);
+  }catch(e){$('#le').textContent=e.code==='auth/popup-closed-by-user'?'':'Google login fail: '+(e.code||e)}
+}
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const unb64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
+async function kdf(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function gz(u8,mode){if(!window.CompressionStream)return u8;const cs=mode==='c'?new CompressionStream('gzip'):new DecompressionStream('gzip'),w=cs.writable.getWriter();w.write(u8);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+async function backupMenu(){
+  modal(`<h2>💾 Backup / Restore</h2><p id="bk" style="color:var(--dim);margin-bottom:10px;font-size:13.5px">Check ho raha hai…</p>
+  <button class="btn" onclick="closeM();doBackup(true)">☁️ Poora backup (photos ke saath)</button>
+  <button class="btn g" onclick="closeM();doBackup(false)">📝 Sirf text backup (halka)</button>
+  <button class="btn g" onclick="closeM();restoreBackup()">♻️ Restore karein</button><button class="btn g" onclick="closeM()">Close</button>`);
+  try{const m=await db.collection('pakchat_backup').doc(me.id).get(),e=$('#bk');if(e)e.textContent=m.exists?'Aakhri backup: '+new Date(m.data().ts).toLocaleString()+(m.data().media?' (photos ke saath)':' (sirf text)'):'Abhi koi backup nahi hai. Backup password se encrypt ho kar server par jata hai, sirf aap hi khol sakte hain.'}catch(e){}
+}
+async function doBackup(media){
+  const pw=prompt('Backup ka password chunein (yaad rakhein! bhool gaye to backup wapas nahi aayega):');
+  if(!pw||pw.length<6)return toast('Password kam az kam 6 characters ka rakhein');
+  if(pw!==prompt('Password dobara likhein:'))return toast('Password match nahi hua');
+  toast('Backup ban raha hai…');
+  try{
+    const c=JSON.parse(JSON.stringify(chats));
+    if(!media)Object.values(c).forEach(ch=>ch.msgs.forEach(m=>{if(m.data){m.data=null;m.nomedia=1}}));
+    const raw=new TextEncoder().encode(JSON.stringify({v:1,me:{name:me.name,color:me.color,dp:me.dp,blocked:me.blocked,wp:me.wp},chats:c}));
+    const zipped=await gz(raw,'c'),salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    const t=b64(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await kdf(pw,salt),zipped)));
+    if(t.length>9e6)return toast('Backup bohat bara hai ('+(t.length/1e6).toFixed(1)+' MB). "Sirf text" backup lein.');
+    const SZ=700000,n=Math.ceil(t.length/SZ),tag=String(Date.now()),base=db.collection('pakchat_backup').doc(me.id);
+    const om=await base.get().catch(()=>null);
+    for(let i=0;i<n;i++)await base.collection('parts').doc(tag+'_'+i).set({d:t.slice(i*SZ,(i+1)*SZ)});
+    await base.set({tag,n,ts:Date.now(),salt:b64(salt),iv:b64(iv),gz:zipped!==raw,media:!!media,size:t.length,v:1});
+    if(om&&om.exists&&om.data().tag){const od=om.data();for(let i=0;i<od.n;i++)base.collection('parts').doc(od.tag+'_'+i).delete().catch(()=>{})}
+    toast('Backup ho gaya ✅ ('+(t.length/1e6).toFixed(1)+' MB)');
+  }catch(e){console.error(e);toast('Backup fail: '+(e.code||e.message||e))}
+}
+async function restoreBackup(){
+  try{
+    const base=db.collection('pakchat_backup').doc(me.id),m=await base.get();
+    if(!m.exists)return toast('Is ID ka koi backup nahi mila');
+    const d=m.data(),pw=prompt('Backup ka password likhein (banaya gaya: '+new Date(d.ts).toLocaleString()+'):');if(!pw)return;
+    toast('Restore ho raha hai…');
+    let t='';for(let i=0;i<d.n;i++){const p=await base.collection('parts').doc(d.tag+'_'+i).get();if(!p.exists)throw new Error('backup ka hissa gum hai');t+=p.data().d}
+    let dec;try{dec=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(d.iv)},await kdf(pw,unb64(d.salt)),unb64(t)))}catch(e){return toast('Password galat hai')}
+    if(d.gz)dec=await gz(dec,'d');
+    const o=JSON.parse(new TextDecoder().decode(dec));let n=0;
+    Object.entries(o.chats||{}).forEach(([id,c])=>{n++;const l=chats[id];if(!l){chats[id]=c;return}
+      const ids=new Set(l.msgs.map(x=>x.id));c.msgs.forEach(x=>{if(!ids.has(x.id))l.msgs.push(x)});l.msgs.sort((a,b)=>a.ts-b.ts);
+      ['pin','mute','alias'].forEach(k=>{if(l[k]==null&&c[k]!=null)l[k]=c[k]})});
+    if(o.me){me.blocked=[...new Set([...(me.blocked||[]),...(o.me.blocked||[])])];if(!me.dp&&o.me.dp)me.dp=o.me.dp;if(!me.wp&&o.me.wp)me.wp=o.me.wp;LS.set('me',me)}
+    saveNow();Object.values(chats).forEach(c=>{});Object.keys(chats).forEach(id=>{const c=chats[id];if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
+    renderList();toast('Restore ho gaya ✅ ('+n+' chats)');
+  }catch(e){console.error(e);toast('Restore fail: '+(e.code||e.message||e))}
+}
+// ---- App khulne par dikhne wala notice. Naya masla ho to sirf id aur text badlein, sab ko dobara dikhega ----
+const NOTICE={id:'backup-2',text:'🔐 Naya: ab Settings mein jaa kar (1) "Google se ID jodein" aur (2) "Backup / Restore" zaroor karein. Isse naya phone lene ya browser data clear hone par bhi aap ki ID aur chats wapas aa jayengi. Backup ka password yaad rakhein!'};
+function showNotice(){if(!NOTICE.text||LS.get('notice',null)===NOTICE.id)return;$('#ntx').textContent=NOTICE.text;$('#notice').classList.remove('hide')}
+function closeNotice(){$('#notice').classList.add('hide');LS.set('notice',NOTICE.id)}
 let divIdx=-1;
 const VAPID='PASTE_VAPID_KEY_HERE';
 async function setupPush(){
