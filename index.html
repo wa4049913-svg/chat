@@ -8,6 +8,7 @@
 <title>WaqarChat</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#111b21;--pn:#202c33;--ch:#0b141a;--me:#005c4b;--yo:#202c33;--tx:#e9edef;--dim:#8696a0;--ac:#00a884;--bl:#53bdeb;--bd:#2a3942;--dg:#f15c6d;--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
@@ -164,24 +165,26 @@ async function login(){
   if(id.length<3)return $('#le').textContent='ID kam az kam 3 characters ki ho';
   $('#lb').disabled=true;$('#le').textContent='';
   try{
-    initFB();const ref=db.collection(U).doc(id);
+    initFB();const user=await getUser();const ref=db.collection(U).doc(id);
     const s=await ref.get({source:'server'}).catch(()=>null);
-    const tok=(me&&me.id===id&&me.tok)||Math.random().toString(36).slice(2)+Date.now().toString(36);
-    if(s&&s.exists&&s.data().tok&&s.data().tok!==tok){$('#le').textContent='Yeh ID kisi aur ke paas hai. Doosri ID chunein.';$('#lb').disabled=false;return}
-    me={id,name,tok,color:pc(id),dp:(me&&me.dp)||null};LS.set('me',me);
-    await ref.set({name,color:me.color,tok,dp:me.dp,lastSeen:Date.now()},{merge:true});
+    if(s&&s.exists&&s.data().uid&&s.data().uid!==user.uid){$('#le').textContent='Yeh ID kisi aur ke paas hai. Doosri ID chunein.';$('#lb').disabled=false;return}
+    me={id,name,color:pc(id),dp:(me&&me.dp)||null};LS.set('me',me);
+    await ref.set({uid:user.uid,name,color:me.color,dp:me.dp,lastSeen:Date.now()},{merge:true});
     chats=(await idbGet('chats_'+id))||{};enter();
   }catch(e){$('#le').textContent='Server se connect nahi hua. Internet check karein.';$('#lb').disabled=false}
 }
-let fbOK=false;
-function initFB(){if(fbOK)return;if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.firestore();db.enablePersistence({synchronizeTabs:true}).catch(()=>{});fbOK=true}
-function enter(){
+let fbOK=false,auth=null;
+function initFB(){if(fbOK)return;if(!firebase.apps.length)firebase.initializeApp(FB);auth=firebase.auth();db=firebase.firestore();db.enablePersistence({synchronizeTabs:true}).catch(()=>{});fbOK=true}
+function getUser(){return new Promise((res,rej)=>{const u=auth.onAuthStateChanged(x=>{u();if(x)res(x);else auth.signInAnonymously().then(c=>res(c.user)).catch(rej)})})}
+async function enter(){
   $('#login').classList.add('hide');$('#app').classList.remove('hide');
   me.blocked=me.blocked||[];
   $('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');$('#mn').textContent=me.name;$('#mi').textContent=me.id+' 📋';
   buildEmoji();renderList();   // chats turant dikh jati hain (offline bhi)
   const last=LS.get('last',null);if(last&&chats[last]&&innerWidth>860)openChat(last);
-  try{initFB()}catch(e){return}
+  try{initFB();const u=await getUser();
+    db.collection(U).doc(me.id).set({uid:u.uid,name:me.name,color:me.color,dp:me.dp||null,lastSeen:Date.now()},{merge:true}).catch(()=>toast('Yeh ID kisi aur ke paas hai. Logout karke nayi ID lein.'));
+  }catch(e){addEventListener('online',()=>location.reload(),{once:true});return}
   ping();setInterval(()=>{if(!document.hidden)ping()},25000);
   Object.entries(chats).forEach(([id,c])=>{if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
   listen();
