@@ -151,11 +151,11 @@ function toast(t){const e=document.createElement('div');e.id='toast';e.textConte
 const idb=new Promise(r=>{try{const q=indexedDB.open('wc',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
 async function idbGet(k){const d=await idb;if(!d)return null;return new Promise(r=>{const q=d.transaction('k').objectStore('k').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}
 async function idbSet(k,v){const d=await idb;if(d)try{d.transaction('k','readwrite').objectStore('k').put(v,k)}catch(e){}}
-let st;function save(){clearTimeout(st);st=setTimeout(saveNow,60)}function saveNow(){if(me)idbSet('chats_'+me.id,chats)}
+let st;function save(){clearTimeout(st);st=setTimeout(()=>{saveNow();syncC()},60)}function saveNow(){if(me)idbSet('chats_'+me.id,chats)}
 addEventListener('pagehide',saveNow);
 
 /* ---------- boot / login ---------- */
-async function boot(){
+async function boot(){lockScreen();
   if(LS.get('theme','dark')==='light')document.body.classList.add('light');
   if(me&&me.id){
     chats=(await idbGet('chats_'+me.id))||{};
@@ -193,10 +193,10 @@ async function enter(){
   ping();setInterval(()=>{if(!document.hidden)ping()},90000);
   setTimeout(resendPending,3000);setupPush();addEventListener('online',()=>{ping();resendPending()});
   Object.entries(chats).forEach(([id,c])=>{if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
-  listen();listenStatus();
+  listen();listenStatus();if(Object.keys(chats).length){cReady=true;syncC()}else restoreContacts();
   if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
 }
-function ping(x){if(db&&me)db.collection(U).doc(me.id).set({lastSeen:Date.now(),...(x||{})},{merge:true}).catch(()=>{})}
+function ping(x){if(db&&me)db.collection(U).doc(me.id).set({...(me.hideSeen?{hide:1}:{lastSeen:Date.now(),hide:0}),...(x||{})},{merge:true}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(!me)return;if(!document.hidden){ping();if(cur){chats[cur].unread=0;markRead(cur);renderList()}}else saveNow()});
 
 /* ---------- presence / profiles ---------- */
@@ -209,8 +209,8 @@ function watch(id){
     if(p.typing===me.id&&Date.now()-p.typingAt<4000)setTimeout(hdr,4200);
   },()=>{});
 }
-function seen(id){const p=pres[id];if(!p)return'';if(p.typing===me.id&&Date.now()-p.typingAt<4000)return'typing…';if(Date.now()-p.lastSeen<150000)return'online';const d=dl(p.lastSeen);return'last seen '+(d==='Today'?'today':d==='Yesterday'?'yesterday':d)+' at '+tm(p.lastSeen)}
-const isOn=id=>pres[id]&&Date.now()-pres[id].lastSeen<150000;
+function seen(id){const p=pres[id];if(!p||p.hide)return'';if(p.typing===me.id&&Date.now()-p.typingAt<4000)return'typing…';if(Date.now()-p.lastSeen<150000)return'online';const d=dl(p.lastSeen);return'last seen '+(d==='Today'?'today':d==='Yesterday'?'yesterday':d)+' at '+tm(p.lastSeen)}
+const isOn=id=>pres[id]&&!pres[id].hide&&Date.now()-pres[id].lastSeen<150000;
 const nameOf=id=>id===me.id?'Aap':(pres[id]&&pres[id].name)||(chats[id]&&chats[id].name)||id;
 
 /* ---------- send / receive ---------- */
@@ -255,7 +255,7 @@ function handle(d){
     c.msgs.push(m);c.msgs.sort((a,b)=>a.ts-b.ts);
     put(d.from,{t:'ack',ids:[d.id]},d.gid).catch(()=>{});
     if(cur===cid&&!document.hidden){markRead(cid)}
-    else{c.unread=(c.unread||0)+1;if(!c.mute)notify(c.type==='group'?c.name:c.name,(c.type==='group'?nameOf(d.from)+': ':'')+(d.text||'['+d.kind+']'),cid)}
+    else{c.unread=(c.unread||0)+1;if(!c.mute){beep();if(navigator.vibrate)navigator.vibrate(80)}if(!c.mute)notify(c.type==='group'?c.name:c.name,(c.type==='group'?nameOf(d.from)+': ':'')+(d.text||'['+d.kind+']'),cid)}
     break}
   case'sview':{const x=stat.find(y=>y.id===d.sid);if(x&&!x.views.includes(d.from)){x.views.push(d.from);saveStat()}break}
   case'sdel':stat=stat.filter(y=>y.id!==d.sid);saveStat();break;
@@ -330,10 +330,10 @@ function render(force){
     else{
       if(m.fwd)b+='<div class="fw">↪ Forwarded</div>';
       if(m.reply)b+=`<div class="rq" onclick="jump('${m.reply.id}')"><b>${esc(m.reply.who)}</b><span>${esc(m.reply.text)}</span></div>`;
-      if(m.nomedia)b+='<i class="dd">📎 Media backup mein shamil nahi tha</i>';else if(m.kind==='image')b+=`<img class="mi" src="${m.data}" onclick="viewImg(this.src)">`;
+      if(m.nomedia)b+='<i class="dd">📎 Media backup mein shamil nahi tha</i>';else if(m.kind==='image')b+=`<img class="mi" src="${m.data}" onclick="viewImg(this.src)">`+(m.text?`<div class="t">${lnk(m.text)}</div>`:'');
       else if(m.kind==='file')b+=`<div class="fl"><span style="font-size:28px">📄</span><div><a download="${esc(m.name)}" href="${m.data}">${esc(m.name)}</a><div class="mt" style="text-align:left">${fs(m.size||0)}</div></div></div>`;
       else if(m.kind==='voice')b+=`<audio controls preload="none" src="${m.data}"></audio>`;
-      else b+=`<div class="t">${lnk(m.text)}</div>`;
+      else b+=`<div class="t"${BIGE.test(m.text||'')?' style="font-size:34px;line-height:1.2"':''}>${lnk(m.text)}</div>`;
     }
     const rx=Object.values(m.react||{});let rh='';
     if(rx.length){const cnt={};rx.forEach(e=>cnt[e]=(cnt[e]||0)+1);rh=`<div class="rx">${Object.entries(cnt).map(([e,n])=>e+(n>1?n:'')).join(' ')}</div>`}
@@ -403,7 +403,7 @@ function imgC(file,max,q,sq){return new Promise(r=>{const i=new Image();i.onload
   r(cv.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(file)})}
 $('#fp').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f||!cur)return;
-  if(f.type.startsWith('image/')){return post(cur,{kind:'image',data:await imgC(f,1100,.72),name:f.name})}
+  if(f.type.startsWith('image/')){const cap=prompt('Photo ka caption (optional):')||'';return post(cur,{kind:'image',data:await imgC(f,1100,.72),name:f.name,text:cap})}
   if(f.size>700*1024)return toast('File 700KB se chhoti honi chahiye');
   const r=new FileReader();r.onload=()=>post(cur,{kind:f.type.startsWith('audio/')?'voice':'file',data:r.result,name:f.name,size:f.size,dur:0});r.readAsDataURL(f);
 });
@@ -484,7 +484,7 @@ function settings(){
   <div style="margin:8px 0">🖼️ Chat background<br>${['','#0d1b2a','#1b2a1b','#2a1b2a','#2a2418','#e8d9c5'].map(c=>`<span class="sw" style="background:${c||'var(--ch)'}" onclick="me.wp='${c}';LS.set('me',me);if(cur)openChat(cur);closeM()"></span>`).join('')}</div>
   <div class="row" onclick="closeM();enablePush()"><span>🔔 Notifications on karein</span></div>
   <div class="row" onclick="closeM();showBlocked()"><span>🚫 Blocked users (${me.blocked.length})</span></div>
-  <div class="row" onclick="closeM();backupMenu()"><span>💾 Backup / Restore</span></div>${gRow()}
+  <div class="row" onclick="closeM();backupMenu()"><span>💾 Backup / Restore</span></div>${gRow()}<div class="row" onclick="closeM();setLock()"><span>🔒 App lock (PIN) ${LS.get('lock',null)?'• ON':''}</span></div><div class="row" onclick="toggleHide()"><span>👻 Last seen chhupayein: ${me.hideSeen?'ON':'OFF'}</span></div>
   <div class="mt" style="text-align:center;margin:10px 0">Created by Waqar Ahmed</div>
   <button class="btn g" onclick="logout()">🚪 Logout</button><button class="btn r" onclick="resetAll()">🗑️ Reset All</button><button class="btn g" onclick="closeM()">Close</button>`);
 }
@@ -543,6 +543,14 @@ function viewStatus(owner){
     el.innerHTML=`<div style="display:flex;gap:4px;padding:calc(10px + var(--st)) 10px 6px">${bars}</div>
     <div style="display:flex;align-items:center;gap:10px;padding:6px 14px"><b style="flex:1">${esc(owner===me.id?'Aap ka status':x.name)} <span style="opacity:.7;font-weight:400;font-size:13px">${tm(x.ts)}</span></b>${owner===me.id?`<button onclick="showViews('${x.id}')">👁 ${x.views.length}</button><button onclick="delStatus('${x.id}')">🗑️</button>`:''}<button style="font-size:22px" onclick="document.getElementById('sv').remove();renderList()">✕</button></div>
     <div id="svb" style="flex:1;display:grid;place-items:center;overflow:hidden;${x.kind==='text'?'background:'+x.bg+';padding:24px;':''}">${x.kind==='image'?`<img src="${x.data}" style="max-width:100%;max-height:100%">`:`<div style="font-size:26px;text-align:center;white-space:pre-wrap;word-break:break-word">${esc(x.text)}</div>`}</div>`;
+    if(owner!==me.id){
+      const f=document.createElement('div');f.style.cssText='display:flex;gap:8px;align-items:center;padding:10px 14px calc(10px + var(--sb))';
+      f.innerHTML=['❤️','😂','😮','😢','👍','🔥'].map(e=>`<span style="font-size:26px;cursor:pointer" data-e="${e}">${e}</span>`).join('')+'<input id="srp" placeholder="Reply…" style="flex:1;min-width:0;background:rgba(255,255,255,.15);border-radius:20px;padding:9px 14px;color:#fff"><button id="srb" style="font-size:20px">➤</button>';
+      el.appendChild(f);f.querySelectorAll('[data-e]').forEach(sp=>sp.onclick=()=>sendStatusMsg(x.id,sp.dataset.e));
+      const ri=f.querySelector('#srp'),sr=()=>{const v=ri.value.trim();if(v){sendStatusMsg(x.id,v);ri.value=''}};
+      f.querySelector('#srb').onclick=sr;ri.onkeydown=e=>{if(e.key==='Enter')sr()};ri.onfocus=()=>clearTimeout(t);
+      ri.onblur=()=>{clearTimeout(t);t=setTimeout(()=>{i++;i>=list.length?close():show()},5000)};
+    }
     el.querySelector('#svb').onclick=e=>{i+=e.clientX<innerWidth/3?-1:1;if(i<0)i=0;if(i>=list.length)return close();show()};
     t=setTimeout(()=>{i++;i>=list.length?close():show()},5000);
   };
@@ -574,7 +582,7 @@ async function googleRecover(){
     const id=m.data().id,u=await db.collection(U).doc(id).get(),pr=u.exists?u.data():{};
     me={id,name:pr.name||id,color:pr.color||pc(id),dp:pr.dp||null};LS.set('me',me);
     chats=(await idbGet('chats_'+id))||{};await enter();
-    setTimeout(()=>{if(confirm('ID wapas aa gayi! Kya chats ka backup restore karna chahte hain?'))restoreBackup()},1200);
+    toast('ID wapas aa gayi ✅ Contacts aur groups khud aa rahe hain…');
   }catch(e){$('#le').textContent=e.code==='auth/popup-closed-by-user'?'':'Google login fail: '+(e.code||e)}
 }
 const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
@@ -626,8 +634,74 @@ async function restoreBackup(){
     renderList();toast('Restore ho gaya ✅ ('+n+' chats)');
   }catch(e){console.error(e);toast('Restore fail: '+(e.code||e.message||e))}
 }
+// ================= Contacts auto-sync (chats nahi, sirf contacts + groups) =================
+let cReady=false,sct;
+function syncC(){
+  clearTimeout(sct);
+  sct=setTimeout(async()=>{
+    if(!cReady||!db||!me||!auth||!auth.currentUser)return;
+    const list=Object.entries(chats).map(([i,c])=>c.type==='group'?{i,t:'g',n:c.name,m:c.members||[],a:c.admin||null,dp:c.dp||null,pin:c.pin?1:0,mute:c.mute?1:0}:{i,t:'d',al:c.alias||null,pin:c.pin?1:0,mute:c.mute?1:0});
+    if(!list.length)return;
+    const doc={list,blocked:me.blocked||[]},sig=JSON.stringify(doc);
+    if(sig===LS.get('csig_'+me.id,''))return;
+    try{await db.collection('pakchat_contacts').doc(me.id).set({...doc,ts:Date.now()});LS.set('csig_'+me.id,sig)}catch(e){console.error('sync',e)}
+  },6000);
+}
+async function restoreContacts(){
+  try{
+    const d=await db.collection('pakchat_contacts').doc(me.id).get();cReady=true;
+    if(!d.exists)return;
+    const o=d.data();let n=0;
+    (o.list||[]).forEach(x=>{
+      if(chats[x.i])return;n++;
+      const base={color:pc(x.i),msgs:[],unread:0,pin:!!x.pin,mute:!!x.mute};
+      chats[x.i]=x.t==='g'?{...base,type:'group',name:x.n,members:x.m||[],admin:x.a||null,dp:x.dp||null}:{...base,type:'dm',name:x.al||x.i,...(x.al?{alias:x.al}:{})};
+    });
+    me.blocked=[...new Set([...(me.blocked||[]),...(o.blocked||[])])];LS.set('me',me);
+    Object.keys(chats).forEach(id=>{const c=chats[id];if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
+    if(n){save();renderList();toast('✅ '+n+' contacts/groups wapas aa gaye')}
+  }catch(e){console.error('contacts',e)}
+}
+addEventListener('online',()=>{if(!cReady&&me&&db)restoreContacts()});
+
+// ================= Status reply / reaction =================
+function sendStatusMsg(id,text){
+  const x=stat.find(y=>y.id===id);if(!x)return;const o=x.owner;
+  if(!chats[o]){chats[o]={type:'dm',name:x.name,msgs:[],unread:0,color:pc(o)};watch(o)}
+  post(o,{kind:'text',text,reply:{id:x.id,who:'Status',text:x.kind==='image'?'📷 Status':(x.text||'').slice(0,60)}});
+  toast('Bhej diya ✅');
+}
+
+// ================= App lock, last seen hide, sound, big emoji =================
+const sha=async t=>b64(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('wc:'+t))));
+async function setLock(){
+  const cur_=LS.get('lock',null);
+  if(cur_){
+    const o=prompt('Purana PIN likhein:');if(!o||await sha(o)!==cur_)return toast('PIN galat hai');
+    const n=prompt('Naya PIN (4 se 6 ank). Khali chhorein to lock hat jayega:');
+    if(!n){LS.set('lock',null);return toast('App lock hat gaya')}
+    if(!/^\d{4,6}$/.test(n))return toast('PIN 4 se 6 ankon ka ho');
+    LS.set('lock',await sha(n));return toast('PIN badal gaya ✅');
+  }
+  const n=prompt('Naya PIN chunein (4 se 6 ank):');if(!n)return;
+  if(!/^\d{4,6}$/.test(n))return toast('PIN 4 se 6 ankon ka ho');
+  LS.set('lock',await sha(n));toast('App lock on ho gaya 🔒');
+}
+function lockScreen(){
+  const h=LS.get('lock',null);if(!h||document.getElementById('lkw'))return;
+  const el=document.createElement('div');el.id='lkw';el.style.cssText='position:fixed;inset:0;z-index:900;background:var(--bg);display:grid;place-items:center;text-align:center';
+  el.innerHTML='<div><div style="font-size:50px">🔒</div><h2>WaqarChat lock hai</h2><input id="lk" type="password" inputmode="numeric" maxlength="6" placeholder="PIN" class="fld" style="text-align:center;margin:14px 0;width:200px"><br><button class="btn" style="width:200px" id="lkb">Unlock</button></div>';
+  document.body.appendChild(el);
+  const go=async()=>{if(await sha($('#lk').value)===h)el.remove();else{toast('PIN galat hai');$('#lk').value=''}};
+  $('#lkb').onclick=go;$('#lk').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hidAt=Date.now();else if(hidAt&&Date.now()-hidAt>60000)lockScreen()});
+function toggleHide(){me.hideSeen=!me.hideSeen;LS.set('me',me);ping();closeM();toast(me.hideSeen?'Last seen ab chhupa hua hai':'Last seen dikhega')}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.setValueAtTime(.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.start();o.stop(a.currentTime+.25)}catch(e){}}
+const BIGE=/^(?:\p{Extended_Pictographic}|\uFE0F|\u200d|\s){1,6}$/u;
+
 // ---- App khulne par dikhne wala notice. Naya masla ho to sirf id aur text badlein, sab ko dobara dikhega ----
-const NOTICE={id:'backup-2',text:'🔐 Naya: ab Settings mein jaa kar (1) "Google se ID jodein" aur (2) "Backup / Restore" zaroor karein. Isse naya phone lene ya browser data clear hone par bhi aap ki ID aur chats wapas aa jayengi. Backup ka password yaad rakhein!'};
+const NOTICE={id:'backup-3',text:'🆕 Naya: Google se ID jodne par aap ke contacts aur groups ab khud backup ho jate hain (chats nahi). Settings mein jaa kar "Google se ID jodein" zaroor karein. Status par ab react aur reply bhi kar sakte hain, aur App lock (PIN) bhi aa gaya hai.'};
 function showNotice(){if(!NOTICE.text||LS.get('notice',null)===NOTICE.id)return;$('#ntx').textContent=NOTICE.text;$('#notice').classList.remove('hide')}
 function closeNotice(){$('#notice').classList.add('hide');LS.set('notice',NOTICE.id)}
 let divIdx=-1;
