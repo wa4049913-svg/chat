@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#202c33">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WaqarChat">
@@ -82,6 +82,54 @@ audio{height:36px;max-width:230px}
 .sw{display:inline-block;width:34px;height:34px;border-radius:50%;margin:4px;border:2px solid var(--bd);cursor:pointer}
 #toast{position:fixed;bottom:calc(30px + var(--sb));left:50%;transform:translateX(-50%);background:var(--pn);border:1px solid var(--bd);padding:10px 20px;border-radius:10px;z-index:400;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 #vw{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:350;display:grid;place-items:center}#vw img{max-width:96%;max-height:96%}
+
+/* ===== Look v2 (WhatsApp se zyada saaf aur mobile friendly) ===== */
+:root{--bg:#0b141a;--pn:#1f2c34;--ch:#0b141a;--me:#005c4b;--yo:#1f2c34;--bd:#26343c;--ac:#00a884;--dim:#8696a0;--tx:#e9edef}
+body.light{--bg:#fff;--pn:#f0f2f5;--ch:#efeae2;--me:#d9fdd3;--yo:#fff;--bd:#e4e7ea;--tx:#111b21;--dim:#667781}
+html{-webkit-text-size-adjust:100%}
+body{font-size:15.5px;letter-spacing:.1px}
+input,textarea{font-size:16px!important}
+button{touch-action:manipulation}
+#back{display:none}
+@media(max-width:860px){#back{display:grid}}
+.hd{min-height:62px;box-shadow:0 1px 0 var(--bd)}
+.ib{width:44px;height:44px;font-size:20px;border-radius:50%}
+.ib:active,.ci:active{background:var(--bd)}
+.av{box-shadow:0 0 0 2px var(--bg)}
+.sr input{background:var(--pn);border-radius:12px;padding:11px 16px}
+.chip{padding:7px 16px;font-weight:600}
+.ci{padding:11px 16px;gap:14px}.cm{border-bottom:1px solid var(--bd)}.ci.act{background:var(--pn)}
+.cn{font-size:16.5px}.cl{font-size:14px}
+.bdg{background:var(--ac);color:#04251d;font-weight:800}
+.fab{width:58px;height:58px;border-radius:18px;box-shadow:0 6px 18px rgba(0,168,132,.45)}
+#msgs{gap:2px;padding:12px 6% 8px}
+@media(max-width:860px){#msgs{padding:10px 8px 6px}}
+.day{position:sticky;top:6px;z-index:2;box-shadow:0 1px 2px rgba(0,0,0,.25);font-weight:600}
+.msg{border-radius:14px;padding:7px 11px 5px;font-size:15.5px;line-height:1.38;box-shadow:0 1px 1px rgba(0,0,0,.22);max-width:min(80%,520px)}
+.msg.me{border-top-right-radius:4px}.msg.yo{border-top-left-radius:4px}
+.msg.me+.msg.me,.msg.yo+.msg.yo{border-radius:14px;margin-top:1px}
+.mt{opacity:.8}
+.mi{border-radius:10px;max-height:340px;object-fit:cover}
+.rq{border-radius:8px}
+@media(hover:none){.chev{opacity:.45}}
+.vm{display:flex;align-items:center;gap:10px;min-width:220px;padding:2px 0}
+.vp{width:40px;height:40px;border-radius:50%;background:var(--ac);color:#fff;font-size:15px;flex-shrink:0;display:grid;place-items:center}
+.vw{flex:1;display:flex;align-items:center;gap:2px;height:30px}
+.vw i{width:3px;border-radius:2px;background:currentColor;opacity:.35;transition:opacity .15s,background .15s}
+.vw i.pl{opacity:1;background:var(--ac)}
+.vd{font-size:12px;opacity:.8;min-width:32px;text-align:right}
+.cmp{padding:8px 8px calc(8px + var(--sb));gap:4px}
+.cmp textarea{background:var(--bg);border:1px solid var(--bd);border-radius:24px;padding:11px 16px;min-height:46px}
+.sbtn{width:48px;height:48px;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.att{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-radius:20px 20px 0 0}
+.att button{padding:14px 4px;border-radius:16px;font-weight:600}
+.pnl{grid-template-columns:repeat(8,1fr)}
+#ctx{border-radius:14px;min-width:220px}#ctx div{padding:13px 18px}
+.btn{border-radius:14px;padding:13px 18px}
+@media(max-width:600px){
+  .mb{place-items:end center;padding:0}
+  .md{border-radius:24px 24px 0 0;max-width:none;max-height:88dvh;padding:22px 20px calc(22px + var(--sb))}
+}
 </style>
 </head>
 <body>
@@ -107,7 +155,7 @@ audio{height:36px;max-width:230px}
 <main id="main">
   <div id="welcome"><div><div style="font-size:70px">💬</div><h2>WaqarChat</h2><p>Chat kholein ya ➕ dabakar nayi chat shuru karein</p></div></div>
   <div id="chat" class="hide" style="display:flex;flex-direction:column;flex:1;min-height:0">
-    <div class="hd"><button class="ib" id="back" onclick="closeChat()">←</button><div id="hav" onclick="info()" style="cursor:pointer"></div>
+    <div class="hd"><button class="ib" id="back" onclick="goBack()">←</button><div id="hav" onclick="info()" style="cursor:pointer"></div>
       <div class="t" onclick="info()"><div class="n" id="hn"></div><div class="s" id="hs"></div></div>
       <button class="ib" onclick="toggleSearch()">🔍</button><button class="ib" onclick="chatMenu()">⋮</button></div>
     <div class="sr hide" id="msr"><input id="mq" placeholder="Is chat mein search..." oninput="searchQ=this.value;render()"></div>
@@ -124,7 +172,8 @@ audio{height:36px;max-width:230px}
   </div>
 </main>
 </div>
-<div id="ctx" class="hide"></div><div id="modal"></div><input type="file" id="fp" class="hide">
+<div id="ctx" class="hide"></div><div id="modal"></div><input type="file" id="fp" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0">
+<input type="file" id="fp2" accept="image/*" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0">
 
 <script>
 const FB={apiKey:"AIzaSyAZtS_Cej59NEDhWo6WV2MsvTj2hZERbe8",authDomain:"pakfriend-chat.firebaseapp.com",projectId:"pakfriend-chat",storageBucket:"pakfriend-chat.firebasestorage.app",messagingSenderId:"868155894444",appId:"1:868155894444:web:9b6ec28cd3fee4fb208d09"};
@@ -159,7 +208,7 @@ async function boot(){lockScreen();
   if(LS.get('theme','dark')==='light')document.body.classList.add('light');
   if(me&&me.id){
     chats=(await idbGet('chats_'+me.id))||{};
-    if(!Object.keys(chats).length){const o=LS.get('chats',null);if(o)Object.entries(o).forEach(([id,c])=>{chats[id]={type:'dm',name:c.name||id,msgs:(c.messages||[]).filter(m=>m.kind!=='system').map(m=>({id:m.ts+'o',from:m.from==='me'?me.id:(m.senderId||id),ts:m.ts,kind:m.kind||'text',text:m.text,data:m.data,name:m.name,size:m.size,dur:m.duration,status:'read'})),unread:0}})}
+    if(!LS.get('migrated',false)){LS.set('migrated',true);const o=Object.keys(chats).length?null:LS.get('chats',null);localStorage.removeItem('wc_chats');if(o)Object.entries(o).forEach(([id,c])=>{chats[id]={type:'dm',name:c.name||id,msgs:(c.messages||[]).filter(m=>m.kind!=='system').map(m=>({id:m.ts+'o',from:m.from==='me'?me.id:(m.senderId||id),ts:m.ts,kind:m.kind||'text',text:m.text,data:m.data,name:m.name,size:m.size,dur:m.duration,status:'read'})),unread:0}})}
     enter();
   }else{$('#login').classList.remove('hide');$('#li').value='user-'+Math.floor(1000+Math.random()*9000)}
 }
@@ -183,7 +232,7 @@ function initFB(){if(fbOK)return;if(!firebase.apps.length)firebase.initializeApp
 function getUser(){return new Promise((res,rej)=>{const u=auth.onAuthStateChanged(x=>{u();if(x)res(x);else auth.signInAnonymously().then(c=>res(c.user)).catch(rej)})})}
 async function enter(){
   $('#login').classList.add('hide');$('#app').classList.remove('hide');
-  me.blocked=me.blocked||[];stat=((await idbGet('stat_'+me.id))||[]).filter(x=>x.exp>Date.now());
+  me.blocked=me.blocked||[];stat=((await idbGet('stat_'+me.id))||[]).filter(x=>x.exp>Date.now());await loadGone();
   $('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');$('#mn').textContent=me.name;$('#mi').textContent=me.id+' 📋';
   buildEmoji();renderList();showNotice();   // chats turant dikh jati hain (offline bhi)
   const last=new URLSearchParams(location.search).get('chat')||LS.get('last',null);if(last&&chats[last]&&(innerWidth>860||location.search.includes('chat=')))openChat(last);
@@ -235,12 +284,13 @@ function push(cid,m){
 function resendPending(){Object.entries(chats).forEach(([cid,c])=>c.msgs.forEach(m=>{if(m.from===me.id&&m.status==='pending')push(cid,m)}))}
 function listen(){
   db.collection(C).where('to','==',me.id).onSnapshot(s=>{
-    s.docChanges().forEach(ch=>{if(ch.type!=='added')return;const d=ch.doc.data();try{handle(d)}catch(e){console.error(e)}ch.doc.ref.delete().catch(()=>{})});
+    s.docChanges().forEach(ch=>{if(ch.type!=='added')return;const d=ch.doc.data();try{handle(d)}catch(e){console.error(e)}ch.doc.ref.delete().catch(e=>console.error('server delete fail',e))});
     saveNow();renderList();if(cur)render();
   },e=>console.error(e));
 }
 function handle(d){
   if(!d.t||me.blocked.includes(d.from))return;
+  if(d.t==='m'&&gone.has(d.id))return;
   const cid=d.gid||d.from;let isNew=false;
   if(!chats[cid]){isNew=true;chats[cid]=d.gid?{type:'group',name:d.gname||'Group',members:d.members||[],admin:d.admin||null,msgs:[],unread:0,color:pc(cid)}:{type:'dm',name:d.fromName||cid,msgs:[],unread:0,color:pc(cid)};
     if(d.gid)(d.members||[]).forEach(watch);else watch(cid)}
@@ -301,6 +351,7 @@ function renderList(){
 /* ---------- open chat ---------- */
 function openChat(id){
   if(!chats[id])return;
+  if(innerWidth<=860&&!(history.state&&history.state.c))history.pushState({c:id},'');
   if(cur&&chats[cur])chats[cur].draft=$('#inp').value;
   cur=id;const c=chats[id];divIdx=c.unread?c.msgs.length-c.unread:-1;c.unread=0;replyTo=editing=null;searchQ='';$('#mq').value='';$('#msr').classList.add('hide');
   $('#welcome').classList.add('hide');$('#chat').classList.remove('hide');$('#app').classList.add('open');
@@ -332,14 +383,14 @@ function render(force){
       if(m.reply)b+=`<div class="rq" onclick="jump('${m.reply.id}')"><b>${esc(m.reply.who)}</b><span>${esc(m.reply.text)}</span></div>`;
       if(m.nomedia)b+='<i class="dd">📎 Media backup mein shamil nahi tha</i>';else if(m.kind==='image')b+=`<img class="mi" src="${m.data}" onclick="viewImg(this.src)">`+(m.text?`<div class="t">${lnk(m.text)}</div>`:'');
       else if(m.kind==='file')b+=`<div class="fl"><span style="font-size:28px">📄</span><div><a download="${esc(m.name)}" href="${m.data}">${esc(m.name)}</a><div class="mt" style="text-align:left">${fs(m.size||0)}</div></div></div>`;
-      else if(m.kind==='voice')b+=`<audio controls preload="none" src="${m.data}"></audio>`;
+      else if(m.kind==='voice')b+=voiceHTML(m);
       else b+=`<div class="t"${BIGE.test(m.text||'')?' style="font-size:34px;line-height:1.2"':''}>${lnk(m.text)}</div>`;
     }
     const rx=Object.values(m.react||{});let rh='';
     if(rx.length){const cnt={};rx.forEach(e=>cnt[e]=(cnt[e]||0)+1);rh=`<div class="rx">${Object.entries(cnt).map(([e,n])=>e+(n>1?n:'')).join(' ')}</div>`}
     h+=`<div class="msg ${mine?'me':'yo'} ${rh?'hr':''}" id="m_${m.id}" data-id="${m.id}"><button class="chev" onclick="menu(event,'${m.id}')">⌄</button>${b}<div class="mt">${m.star?'⭐ ':''}${m.edited&&!m.deleted?'edited ':''}${tm(m.ts)} ${mine?tk(m.status):''}</div>${rh}</div>`;
   });
-  box.innerHTML=h;if(near)box.scrollTop=box.scrollHeight;
+  box.innerHTML=h;if(near)box.scrollTop=box.scrollHeight;updV();
 }
 const find=id=>chats[cur].msgs.find(m=>m.id===id);
 function jump(id){const e=document.getElementById('m_'+id);if(e){e.scrollIntoView({block:'center'});e.classList.add('flash');setTimeout(()=>e.classList.remove('flash'),1300)}}
@@ -365,7 +416,7 @@ $('#msgs').addEventListener('touchstart',e=>{const m=e.target.closest('.msg');if
 $('#msgs').addEventListener('touchmove',e=>{clearTimeout(lp)},{passive:true});
 $('#msgs').addEventListener('touchend',e=>{clearTimeout(lp);const m=e.target.closest('.msg'),t=e.changedTouches[0];if(m&&t.clientX-tx>70&&Math.abs(t.clientY-ty)<35)setReply(m.dataset.id)});
 function react(id,e){const m=find(id);m.react=m.react||{};if(m.react[me.id]===e)delete m.react[me.id];else m.react[me.id]=e;wire(cur,{t:'react',id,e:m.react[me.id]||''});save();render()}
-function delMe(id){const c=chats[cur];c.msgs=c.msgs.filter(m=>m.id!==id);save();render();renderList()}
+function delMe(id){markGone([id]);const c=chats[cur];c.msgs=c.msgs.filter(m=>m.id!==id);save();render();renderList()}
 function delAll(id){const m=find(id);m.deleted=1;m.text='';m.data=null;wire(cur,{t:'del',id});save();render();renderList()}
 function setReply(id){const m=find(id);replyTo={id,who:m.from===me.id?'Aap':nameOf(m.from),text:prev(m).slice(0,80)};editing=null;showRB('↩️ <b>'+esc(replyTo.who)+'</b>',replyTo.text);$('#inp').focus()}
 function startEdit(id){const m=find(id);editing=id;replyTo=null;$('#inp').value=m.text;fit();showRB('✏️ <b>Edit message</b>',m.text);$('#inp').focus();sicon()}
@@ -396,25 +447,52 @@ $('#inp').addEventListener('input',()=>{
 $('#inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}});
 function buildEmoji(){$('#emo').innerHTML=EM.map(e=>`<span>${e}</span>`).join('');$('#emo').onclick=e=>{if(e.target.tagName==='SPAN'){$('#inp').value+=e.target.textContent;fit();sicon()}}}
 let fcap=0;
-function pick(a,cap){const f=$('#fp');f.accept=a;cap?f.setAttribute('capture','environment'):f.removeAttribute('capture');f.click();$('#att').classList.add('hide')}
-function imgC(file,max,q,sq){return new Promise(r=>{const i=new Image();i.onload=()=>{const cv=document.createElement('canvas'),x=cv.getContext('2d');
-  if(sq){const s=Math.min(i.width,i.height);cv.width=cv.height=max;x.drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}
-  else{const k=Math.min(1,max/Math.max(i.width,i.height));cv.width=i.width*k|0;cv.height=i.height*k|0;x.drawImage(i,0,0,cv.width,cv.height)}
-  r(cv.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(file)})}
+function pick(a,cap){const f=$('#fp');f.value='';f.accept=a;cap?f.setAttribute('capture','environment'):f.removeAttribute('capture');f.click();$('#att').classList.add('hide')}
+function imgC(file,max,q,sq){return new Promise((res,rej)=>{
+  const u=URL.createObjectURL(file),i=new Image();
+  i.onload=()=>{try{
+    const cv=document.createElement('canvas'),x=cv.getContext('2d');
+    if(sq){const s=Math.min(i.width,i.height);cv.width=cv.height=max;x.fillStyle='#fff';x.fillRect(0,0,max,max);x.drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}
+    else{const k=Math.min(1,max/Math.max(i.width,i.height));cv.width=Math.max(1,i.width*k|0);cv.height=Math.max(1,i.height*k|0);x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(i,0,0,cv.width,cv.height)}
+    URL.revokeObjectURL(u);res(cv.toDataURL('image/jpeg',q));
+  }catch(e){rej(e)}};
+  i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('image'))};i.src=u;
+})}
 $('#fp').addEventListener('change',async e=>{
-  const f=e.target.files[0];e.target.value='';if(!f||!cur)return;
-  if(f.type.startsWith('image/')){const cap=prompt('Photo ka caption (optional):')||'';return post(cur,{kind:'image',data:await imgC(f,1100,.72),name:f.name,text:cap})}
-  if(f.size>700*1024)return toast('File 700KB se chhoti honi chahiye');
-  const r=new FileReader();r.onload=()=>post(cur,{kind:f.type.startsWith('audio/')?'voice':'file',data:r.result,name:f.name,size:f.size,dur:0});r.readAsDataURL(f);
+  const inp=e.target,f=inp.files&&inp.files[0];if(!f||!cur){inp.value='';return}
+  const to=cur;
+  try{
+    if(f.type.startsWith('image/')||/\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name)){
+      const data=await imgC(f,1100,.72),cap=$('#inp').value.trim();   // text box mein likha hua caption ban jata hai
+      post(to,{kind:'image',data,name:f.name,text:cap});
+      if(cap){$('#inp').value='';fit();sicon()}
+    }else{
+      if(f.size>600*1024)throw new Error('File 600KB se chhoti honi chahiye');
+      const data=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)});
+      post(to,{kind:f.type.startsWith('audio/')?'voice':'file',data,name:f.name,size:f.size,dur:0});
+    }
+  }catch(err){toast(err&&err.message==='image'?'Yeh photo khul nahi saki, doosri try karein':(err&&err.message)||'File nahi gayi')}
+  inp.value='';
 });
+function recMime(){if(!window.MediaRecorder)return'';for(const t of['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'])if(MediaRecorder.isTypeSupported(t))return t;return''}
 async function toggleRec(){
+  if(mrec&&mrec.state==='recording')return;
+  if(!navigator.mediaDevices||!window.MediaRecorder)return toast('Is browser mein voice recording nahi chalti');
+  const to=cur;
   try{
     const s=await navigator.mediaDevices.getUserMedia({audio:true});rchunks=[];
-    mrec=new MediaRecorder(s);mrec.ondataavailable=e=>e.data.size&&rchunks.push(e.data);
-    mrec.onstop=()=>{s.getTracks().forEach(t=>t.stop());if(!mrec.send||!rchunks.length)return;const r=new FileReader();r.onload=()=>post(cur,{kind:'voice',data:r.result,dur:rsec});r.readAsDataURL(new Blob(rchunks,{type:mrec.mimeType}))};
-    mrec.start();rsec=0;$('#rt').textContent='0:00';$('#rec').classList.remove('hide');
-    rtimer=setInterval(()=>{rsec++;$('#rt').textContent=mm(rsec);if(rsec>=90)stopRec(1)},1000);
-  }catch(e){toast('Mic ki permission nahi mili')}
+    const mt=recMime(),opt={audioBitsPerSecond:24000};if(mt)opt.mimeType=mt;
+    let r;try{r=new MediaRecorder(s,opt)}catch(e){r=new MediaRecorder(s)}
+    mrec=r;r.ondataavailable=e=>{if(e.data&&e.data.size)rchunks.push(e.data)};
+    r.onstop=()=>{
+      s.getTracks().forEach(t=>t.stop());if(!r.send||!rchunks.length)return;
+      const fr=new FileReader();
+      fr.onload=()=>{if(fr.result.length>900000)return toast('Voice bohat bari hai, chhoti record karein');post(to,{kind:'voice',data:fr.result,dur:Math.max(1,rsec)})};
+      fr.readAsDataURL(new Blob(rchunks,{type:r.mimeType||mt||'audio/webm'}));
+    };
+    r.start(1000);rsec=0;$('#rt').textContent='0:00';$('#rec').classList.remove('hide');
+    rtimer=setInterval(()=>{rsec++;$('#rt').textContent=mm(rsec);if(rsec>=60)stopRec(1)},1000);
+  }catch(e){toast(e&&e.name==='NotAllowedError'?'Mic ki permission nahi mili (browser settings mein allow karein)':'Mic nahi chala: '+((e&&e.name)||e))}
 }
 function stopRec(send){clearInterval(rtimer);$('#rec').classList.add('hide');if(mrec&&mrec.state==='recording'){mrec.send=send;mrec.stop()}}
 
@@ -463,28 +541,28 @@ async function addMem(){
   c.members.push(id);watch(id);c.msgs.push({id:'s'+Date.now(),kind:'sys',text:nameOf(id)+' ko add kiya gaya',ts:Date.now()});wire(cur,{t:'ginfo',gdp:c.dp||null});save();render();hdr();closeM();
 }
 function leaveG(){if(!confirm('Group chhodein?'))return;const c=chats[cur];c.members=c.members.filter(x=>x!==me.id);wire(cur,{t:'ginfo'});delete chats[cur];save();closeM();closeChat()}
-function gdp(){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){chats[cur].dp=await imgC(f.files[0],120,.7,1);wire(cur,{t:'ginfo',gdp:chats[cur].dp});save();hdr();renderList();info()}};f.click()}
+function gdp(){pickImg(160,.75,1,d=>{chats[cur].dp=d;wire(cur,{t:'ginfo',gdp:d});save();hdr();renderList();info();toast('Group DP badal gayi ✅')})}
 function chatMenu(){
   const c=chats[cur];
   modal(`<h2>${esc(c.name)}</h2><button class="btn g" onclick="closeM();info()">ℹ️ Info</button><button class="btn g" onclick="c1('pin')">${c.pin?'📌 Unpin':'📌 Pin chat'}</button><button class="btn g" onclick="c1('mute')">${c.mute?'🔔 Unmute':'🔇 Mute'}</button>
   <button class="btn g" onclick="closeM();starred()">⭐ Starred messages</button><button class="btn g" onclick="closeM();exportChat()">📤 Chat export (txt)</button><button class="btn g" onclick="closeM();clearChat()">🧹 Chat clear karein</button><button class="btn r" onclick="closeM();delChat()">🗑️ Chat delete karein</button><button class="btn g" onclick="closeM()">Cancel</button>`);
 }
 function c1(k){chats[cur][k]=!chats[cur][k];save();renderList();closeM()}
-function clearChat(){if(confirm('Saare messages hata dein?')){chats[cur].msgs=[];save();render();renderList()}}
-function delChat(){if(confirm('Chat delete karein?')){delete chats[cur];save();closeChat()}}
+function clearChat(){if(confirm('Saare messages hata dein?')){markGone(chats[cur].msgs.map(m=>m.id));chats[cur].msgs=[];save();render();renderList()}}
+function delChat(){if(confirm('Chat delete karein?')){markGone(chats[cur].msgs.map(m=>m.id));delete chats[cur];save();closeChat()}}
 function profile(){
   modal(`<div onclick="mdp()" style="cursor:pointer">${av(me.dp,me.name,me.color,'lg')}</div><p style="text-align:center;color:var(--dim);margin-bottom:12px">DP badalne ke liye photo dabayein</p>
   <input class="fld" id="pn" value="${esc(me.name)}" maxlength="24"><input class="fld" value="${esc(me.id)}" readonly>
   <button class="btn" onclick="saveP()">💾 Save</button>${me.dp?'<button class="btn g" onclick="me.dp=null;saveP()">DP hatayein</button>':''}<button class="btn g" onclick="closeM()">Cancel</button>`);
 }
-function mdp(){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){me.dp=await imgC(f.files[0],128,.7,1);profile()}};f.click()}
+function mdp(){pickImg(160,.75,1,d=>{me.dp=d;LS.set('me',me);ping({dp:d});$('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');toast('DP badal gayi ✅');profile()})}
 function saveP(){const n=($('#pn')&&$('#pn').value.trim())||me.name;me.name=n;LS.set('me',me);ping({name:n,dp:me.dp});$('#mav').innerHTML=av(me.dp,me.name,me.color,'sm');$('#mn').textContent=n;closeM();toast('Profile save ho gaya')}
 function settings(){
   modal(`<h2>⚙️ Settings</h2><div class="row" onclick="setTheme()"><span>🌓 Theme badlein (Dark / Light)</span></div>
   <div style="margin:8px 0">🖼️ Chat background<br>${['','#0d1b2a','#1b2a1b','#2a1b2a','#2a2418','#e8d9c5'].map(c=>`<span class="sw" style="background:${c||'var(--ch)'}" onclick="me.wp='${c}';LS.set('me',me);if(cur)openChat(cur);closeM()"></span>`).join('')}</div>
   <div class="row" onclick="closeM();enablePush()"><span>🔔 Notifications on karein</span></div>
   <div class="row" onclick="closeM();showBlocked()"><span>🚫 Blocked users (${me.blocked.length})</span></div>
-  <div class="row" onclick="closeM();backupMenu()"><span>💾 Backup / Restore</span></div>${gRow()}<div class="row" onclick="closeM();setLock()"><span>🔒 App lock (PIN) ${LS.get('lock',null)?'• ON':''}</span></div><div class="row" onclick="toggleHide()"><span>👻 Last seen chhupayein: ${me.hideSeen?'ON':'OFF'}</span></div>
+  <div class="row" onclick="closeM();backupMenu()"><span>💾 Backup / Restore</span></div>${gRow()}<div class="row" onclick="closeM();LS.set('csig_'+me.id,'');cReady=true;syncC(true)"><span>🔄 Contacts abhi sync karein</span></div><div class="row" onclick="closeM();setLock()"><span>🔒 App lock (PIN) ${LS.get('lock',null)?'• ON':''}</span></div><div class="row" onclick="toggleHide()"><span>👻 Last seen chhupayein: ${me.hideSeen?'ON':'OFF'}</span></div>
   <div class="mt" style="text-align:center;margin:10px 0">Created by Waqar Ahmed</div>
   <button class="btn g" onclick="logout()">🚪 Logout</button><button class="btn r" onclick="resetAll()">🗑️ Reset All</button><button class="btn g" onclick="closeM()">Close</button>`);
 }
@@ -563,6 +641,53 @@ function delStatus(id){
   Object.entries(chats).forEach(([i,c])=>{if(c.type==='dm')put(i,{t:'sdel',sid:id}).catch(()=>{})});
   const v=document.getElementById('sv');if(v)v.remove();renderList();toast('Status delete ho gaya');
 }
+// ================= Mobile helpers: photo picker, voice player, back button =================
+function pickImg(max,q,sq,cb){
+  const f=$('#fp2');f.value='';
+  f.onchange=async()=>{const file=f.files&&f.files[0];if(!file)return;
+    try{cb(await imgC(file,max,q,sq))}catch(e){toast('Photo khul nahi saki, doosri try karein')}
+    f.value=''};
+  f.click();
+}
+function goBack(){if(history.state&&history.state.c)history.back();else closeChat()}
+addEventListener('popstate',()=>{if(cur)closeChat()});
+let vAud=null,vId=null;const vUrl={};
+function voiceHTML(m){
+  let h=0;for(const ch of String(m.id))h=(h*31+ch.charCodeAt(0))>>>0;
+  const bars=Array.from({length:26},()=>{h=(h*1103515245+12345)>>>0;return `<i style="height:${6+(h>>>8)%18}px"></i>`}).join('');
+  return `<div class="vm" data-v="${m.id}" data-d="${m.dur||0}"><button class="vp" onclick="playV('${m.id}')">▶</button><div class="vw">${bars}</div><span class="vd">${m.dur?mm(m.dur):'🎵'}</span></div>`;
+}
+function dataBlob(d){
+  const i=d.indexOf(','),head=d.slice(5,i),bin=atob(d.slice(i+1)),u=new Uint8Array(bin.length);
+  for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);
+  let t=head.split(';')[0];
+  if(!t||t==='application/octet-stream')t=(u[0]===0x1A&&u[1]===0x45)?'audio/webm':(u[4]===0x66&&u[5]===0x74)?'audio/mp4':(u[0]===0x4F&&u[1]===0x67)?'audio/ogg':'audio/mpeg';
+  return new Blob([u],{type:t});
+}
+function playV(id){
+  const m=chats[cur]&&chats[cur].msgs.find(x=>x.id===id);if(!m||!m.data)return;
+  if(vId===id&&vAud){if(vAud.paused)vAud.play().catch(()=>{});else vAud.pause();updV();return}
+  if(vAud)vAud.pause();
+  try{if(!vUrl[id])vUrl[id]=URL.createObjectURL(dataBlob(m.data))}catch(e){return toast('Voice kharab hai')}
+  const a=new Audio(vUrl[id]);vAud=a;vId=id;
+  a.ontimeupdate=updV;a.onpause=updV;a.onplay=updV;
+  a.onended=()=>{vId=null;vAud=null;updV()};
+  a.onerror=()=>{toast('Yeh voice is phone par nahi chal rahi');vId=null;vAud=null;updV()};
+  a.play().catch(e=>{toast('Voice play nahi hui: '+e.name);vId=null;vAud=null;updV()});
+  updV();
+}
+function updV(){
+  document.querySelectorAll('.vm').forEach(el=>{
+    const on=el.dataset.v===vId&&vAud,bars=el.querySelectorAll('.vw i');
+    const D=+el.dataset.d||(on&&isFinite(vAud.duration)?vAud.duration:0),p=on&&D?Math.min(1,vAud.currentTime/D):0;
+    el.querySelector('.vp').textContent=on&&!vAud.paused?'⏸':'▶';
+    bars.forEach((b,i)=>b.classList.toggle('pl',i/bars.length<p));
+  });
+}
+// ================= Hata diye hue messages ki yaad (dobara load na hon) =================
+let gone=new Set();
+async function loadGone(){gone=new Set((await idbGet('gone_'+me.id))||[])}
+function markGone(ids){ids.forEach(i=>gone.add(i));const a=[...gone].slice(-4000);gone=new Set(a);idbSet('gone_'+me.id,a)}
 // ================= Google link + encrypted backup =================
 function gRow(){const g=auth&&auth.currentUser&&auth.currentUser.providerData.find(x=>x.providerId==='google.com');
   return g?`<div class="row"><span>✅ Google juda hai: ${esc(g.email||'')}</span></div>`:`<div class="row" onclick="closeM();linkGoogle()"><span>🔗 Google se ID jodein (zaroori)</span></div>`}
@@ -626,8 +751,8 @@ async function restoreBackup(){
     let dec;try{dec=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(d.iv)},await kdf(pw,unb64(d.salt)),unb64(t)))}catch(e){return toast('Password galat hai')}
     if(d.gz)dec=await gz(dec,'d');
     const o=JSON.parse(new TextDecoder().decode(dec));let n=0;
-    Object.entries(o.chats||{}).forEach(([id,c])=>{n++;const l=chats[id];if(!l){chats[id]=c;return}
-      const ids=new Set(l.msgs.map(x=>x.id));c.msgs.forEach(x=>{if(!ids.has(x.id))l.msgs.push(x)});l.msgs.sort((a,b)=>a.ts-b.ts);
+    Object.entries(o.chats||{}).forEach(([id,c])=>{n++;const l=chats[id];c.msgs=(c.msgs||[]).filter(x=>!gone.has(x.id));if(!l){chats[id]=c;return}
+      const ids=new Set(l.msgs.map(x=>x.id));c.msgs.forEach(x=>{if(!ids.has(x.id)&&!gone.has(x.id))l.msgs.push(x)});l.msgs.sort((a,b)=>a.ts-b.ts);
       ['pin','mute','alias'].forEach(k=>{if(l[k]==null&&c[k]!=null)l[k]=c[k]})});
     if(o.me){me.blocked=[...new Set([...(me.blocked||[]),...(o.me.blocked||[])])];if(!me.dp&&o.me.dp)me.dp=o.me.dp;if(!me.wp&&o.me.wp)me.wp=o.me.wp;LS.set('me',me)}
     saveNow();Object.values(chats).forEach(c=>{});Object.keys(chats).forEach(id=>{const c=chats[id];if(c.type==='dm')watch(id);else(c.members||[]).forEach(watch)});
@@ -636,16 +761,16 @@ async function restoreBackup(){
 }
 // ================= Contacts auto-sync (chats nahi, sirf contacts + groups) =================
 let cReady=false,sct;
-function syncC(){
+function syncC(force){
   clearTimeout(sct);
   sct=setTimeout(async()=>{
     if(!cReady||!db||!me||!auth||!auth.currentUser)return;
     const list=Object.entries(chats).map(([i,c])=>c.type==='group'?{i,t:'g',n:c.name,m:c.members||[],a:c.admin||null,dp:c.dp||null,pin:c.pin?1:0,mute:c.mute?1:0}:{i,t:'d',al:c.alias||null,pin:c.pin?1:0,mute:c.mute?1:0});
-    if(!list.length)return;
+    if(!list.length){if(force)toast('Abhi koi contact ya group nahi hai');return}
     const doc={list,blocked:me.blocked||[]},sig=JSON.stringify(doc);
     if(sig===LS.get('csig_'+me.id,''))return;
-    try{await db.collection('pakchat_contacts').doc(me.id).set({...doc,ts:Date.now()});LS.set('csig_'+me.id,sig)}catch(e){console.error('sync',e)}
-  },6000);
+    try{await db.collection('pakchat_contacts').doc(me.id).set({...doc,ts:Date.now()});LS.set('csig_'+me.id,sig);if(force)toast('Contacts server par save ho gaye ✅ ('+list.length+')')}catch(e){console.error('sync',e);if(force)toast('Sync fail: '+(e.code||e.message||e))}
+  },force?100:6000);
 }
 async function restoreContacts(){
   try{
@@ -733,3 +858,4 @@ boot();
 </script>
 </body>
 </html>
+ 
